@@ -148,10 +148,10 @@ export default function HomePage() {
                 ——只有小红书能做的事。
               </p>
               <Link
-                href="/community/comm_001"
+                href="/community"
                 className="inline-flex items-center gap-1 text-sm font-medium text-emerald-700 group-hover:gap-2 transition-all"
               >
-                看示例小区报告 <ArrowRight className="h-3.5 w-3.5" />
+                浏览全部小区报告 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
           </Card>

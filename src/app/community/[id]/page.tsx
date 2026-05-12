@@ -3,13 +3,12 @@ import { notFound } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PostCard } from "@/components/PostCard";
 import { CommunityRadar } from "@/components/community/CommunityRadar";
+import { MatchBanner } from "@/components/community/MatchBanner";
+import { CommunityInteractive } from "@/components/community/CommunityInteractive";
 import {
   Star,
   ChevronLeft,
-  ThumbsUp,
-  ThumbsDown,
   MessagesSquare,
   Building2,
   Calendar,
@@ -45,13 +44,21 @@ export default function CommunityPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="container py-10 md:py-14 max-w-5xl">
-      <Link
-        href="/"
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors"
-      >
-        <ChevronLeft className="h-4 w-4" />
-        返回首页
-      </Link>
+      <div className="flex items-center justify-between mb-4">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          返回首页
+        </Link>
+        <Link
+          href="/community"
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          查看全部小区 →
+        </Link>
+      </div>
 
       {/* ===== 头部信息 ===== */}
       <Card className="overflow-hidden mb-6">
@@ -151,58 +158,11 @@ export default function CommunityPage({ params }: { params: { id: string } }) {
         </div>
       </Card>
 
-      {/* ===== 优缺点 TOP3 ===== */}
-      <div className="grid md:grid-cols-2 gap-4 mb-6">
-        {/* Pros */}
-        <Card className="p-6">
-          <h2 className="text-base font-bold flex items-center gap-2 mb-4">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
-              <ThumbsUp className="h-4 w-4" />
-            </div>
-            优点 TOP 3
-          </h2>
-          <div className="space-y-4">
-            {community.pros.map((p, i) => (
-              <div key={i} className="pl-3 border-l-2 border-emerald-300">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-semibold text-sm">{p.title}</h3>
-                  <span className="text-[10px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded shrink-0">
-                    {p.evidenceCount} 条
-                  </span>
-                </div>
-                <p className="text-xs text-muted-foreground leading-relaxed mt-1">
-                  {p.summary}
-                </p>
-              </div>
-            ))}
-          </div>
-        </Card>
+      {/* ===== 偏好匹配条幅（核心串联 Feature1 → Feature3）===== */}
+      <MatchBanner community={community} />
 
-        {/* Cons */}
-        <Card className="p-6">
-          <h2 className="text-base font-bold flex items-center gap-2 mb-4">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-rose-50 text-rose-700">
-              <ThumbsDown className="h-4 w-4" />
-            </div>
-            缺点 TOP 3
-          </h2>
-          <div className="space-y-4">
-            {community.cons.map((c, i) => (
-              <div key={i} className="pl-3 border-l-2 border-rose-300">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-semibold text-sm">{c.title}</h3>
-                  <span className="text-[10px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded shrink-0">
-                    {c.evidenceCount} 条
-                  </span>
-                </div>
-                <p className="text-xs text-muted-foreground leading-relaxed mt-1">
-                  {c.summary}
-                </p>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </div>
+      {/* ===== 优缺点 + 真实声音（client interactive） ===== */}
+      <CommunityInteractive community={community} posts={communityPosts} />
 
       {/* ===== 分项雷达图 ===== */}
       <Card className="p-6 mb-6">
@@ -243,36 +203,18 @@ export default function CommunityPage({ params }: { params: { id: string } }) {
         </div>
       </Card>
 
-      {/* ===== 真实声音 ===== */}
-      <div className="mb-12">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-lg font-bold">真实声音</h2>
-            <p className="text-xs text-muted-foreground mt-1">
-              来自住过这里的人的真实记录（数据为虚构 mock）
-            </p>
-          </div>
-          <Badge variant="soft">{communityPosts.length} 条</Badge>
-        </div>
-        <div className="grid md:grid-cols-2 gap-4">
-          {communityPosts.slice(0, 4).map((post) => (
-            <PostCard key={post.id} post={post} />
-          ))}
-        </div>
-      </div>
-
       {/* CTA */}
       <Card className="p-6 bg-gradient-to-r from-brand-red-pale/40 to-rose-50 border-brand-red/10">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h3 className="font-bold mb-1">还想看看其他小区？</h3>
             <p className="text-sm text-muted-foreground">
-              做一次人格测试，让我们告诉你哪些小区最适合你。
+              浏览全部 10 个小区的体检报告，按你的偏好排序。
             </p>
           </div>
           <Button asChild>
-            <Link href="/quiz">
-              开始人格测试 <ArrowRight className="h-4 w-4" />
+            <Link href="/community">
+              查看全部小区 <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
         </div>

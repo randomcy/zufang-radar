@@ -116,14 +116,14 @@ function ResultInner() {
       {/* 底部 CTA */}
       <div className="mt-12 flex flex-col sm:flex-row gap-3">
         <Button asChild size="lg">
-          <Link href="/map">
-            看看符合你偏好的房源
+          <Link href="/community">
+            看看为你推荐的小区
             <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
         <Button asChild variant="outline" size="lg">
-          <Link href="/community/comm_001">
-            或者，先看一个小区体检报告
+          <Link href="/map">
+            或者，看看符合偏好的房源
           </Link>
         </Button>
       </div>
