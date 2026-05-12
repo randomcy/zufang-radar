@@ -94,11 +94,16 @@ export interface DualCommuteStation extends SubwayStation {
   bothFit: boolean;
 }
 
+/**
+ * 双人模式：A 和 B 各自有各自能忍受的通勤时长上限。
+ * 只返回两人各自都“不超过自己上限”的站点。
+ */
 export function stationsForTwoPeople(
   stations: SubwayStation[],
   companyA: Company,
   companyB: Company,
-  maxMinutes: number
+  maxMinutesA: number,
+  maxMinutesB: number
 ): DualCommuteStation[] {
   return stations
     .map((s) => {
@@ -110,7 +115,7 @@ export function stationsForTwoPeople(
         minutesB: mB,
         diffMinutes: Math.abs(mA - mB),
         totalMinutes: mA + mB,
-        bothFit: mA <= maxMinutes && mB <= maxMinutes,
+        bothFit: mA <= maxMinutesA && mB <= maxMinutesB,
       };
     })
     .filter((s) => s.bothFit)

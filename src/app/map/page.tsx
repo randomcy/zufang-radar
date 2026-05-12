@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
@@ -8,16 +8,16 @@ import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import {
   ChevronLeft,
-  Building,
   Train,
   Clock,
   MapPin,
   Users,
   X,
   ArrowRight,
+  Loader2,
 } from "lucide-react";
 
-import stationsData from "../../../data/subway-stations.json";
+import fallbackStations from "../../../data/subway-stations.json";
 
 import {
   stationsWithinCommuteTime,
@@ -25,6 +25,7 @@ import {
   type SubwayStation,
   type Company,
 } from "@/lib/commute";
+
 import { pickLineColor, expandLines } from "@/lib/subway-colors";
 
 const PlaceSearch = dynamic(
@@ -47,7 +48,7 @@ const CommuteMap = dynamic(
   }
 );
 
-const ALL_STATIONS = stationsData as SubwayStation[];
+const FALLBACK_STATIONS = fallbackStations as SubwayStation[];
 
 const DEFAULT_COMPANY_A: Company = {
   id: "default_a",
@@ -63,27 +64,70 @@ const DEFAULT_COMPANY_B: Company = {
   lat: 39.9970,
 };
 
+const LIST_PAGE_SIZE = 24;
+
 export default function MapPage() {
+  const [allStations, setAllStations] = useState<SubwayStation[]>(FALLBACK_STATIONS);
+  const [loadingStations, setLoadingStations] = useState(true);
+  const [stationSource, setStationSource] = useState<"cache" | "amap" | "fallback">(
+    "fallback"
+  );
+
   const [companyA, setCompanyA] = useState<Company>(DEFAULT_COMPANY_A);
   const [companyB, setCompanyB] = useState<Company | null>(null);
-  const [maxMinutes, setMaxMinutes] = useState<number>(40);
+  const [maxMinutesA, setMaxMinutesA] = useState<number>(40);
+  const [maxMinutesB, setMaxMinutesB] = useState<number>(40);
   const [activeStationId, setActiveStationId] = useState<string | null>(null);
+  const [listPage, setListPage] = useState(1);
 
   const isDual = companyB !== null;
 
+  // ===== 进入页面时拉取全量地铁站（动态 import，避免 SSR 加载高德 SDK）=====
+  useEffect(() => {
+    let cancelled = false;
+    import("@/lib/subway-fetcher")
+      .then((mod) => mod.fetchAllBeijingStations(FALLBACK_STATIONS))
+      .then(({ stations, source }) => {
+        if (cancelled) return;
+        setAllStations(stations);
+        setStationSource(source);
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setLoadingStations(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   // ===== 单人模式：等时圈内地铁站 =====
   const singleStations = useMemo(
-    () => stationsWithinCommuteTime(ALL_STATIONS, companyA, maxMinutes),
-    [companyA, maxMinutes]
+    () => stationsWithinCommuteTime(allStations, companyA, maxMinutesA),
+    [allStations, companyA, maxMinutesA]
   );
 
-  // ===== 双人模式：两人通勤都满足的站 =====
+  // ===== 双人模式：A/B 各自上限内 =====
   const dualStations = useMemo(() => {
     if (!companyB) return [];
-    return stationsForTwoPeople(ALL_STATIONS, companyA, companyB, maxMinutes);
-  }, [companyA, companyB, maxMinutes]);
+    return stationsForTwoPeople(
+      allStations,
+      companyA,
+      companyB,
+      maxMinutesA,
+      maxMinutesB
+    );
+  }, [allStations, companyA, companyB, maxMinutesA, maxMinutesB]);
 
   const matchedStations = isDual ? dualStations : singleStations;
+  const totalMatched = matchedStations.length;
+  const visibleStations = matchedStations.slice(0, listPage * LIST_PAGE_SIZE);
+  const hasMore = totalMatched > visibleStations.length;
+
+  // 切换模式或筛选条件变了，重置分页
+  useEffect(() => {
+    setListPage(1);
+  }, [isDual, maxMinutesA, maxMinutesB, companyA.id, companyB?.id]);
 
   const handleEnableDual = () => {
     setCompanyB(DEFAULT_COMPANY_B);
@@ -104,15 +148,27 @@ export default function MapPage() {
       </Link>
 
       <div className="mb-6">
-        <div className="text-xs text-sky-700 font-semibold uppercase tracking-widest mb-2">
+        <div className="text-xs text-sky-700 font-semibold uppercase tracking-widest mb-2 flex items-center gap-2">
           功能二 · 通勤地图
+          {loadingStations ? (
+            <span className="inline-flex items-center gap-1 text-[10px] font-normal text-muted-foreground normal-case tracking-normal">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              正在加载全量地铁站…
+            </span>
+          ) : (
+            <span className="text-[10px] font-normal text-muted-foreground normal-case tracking-normal">
+              已加载 {allStations.length} 站
+              {stationSource === "cache" && " · 缓存"}
+              {stationSource === "fallback" && " · 离线兜底"}
+            </span>
+          )}
         </div>
         <h1 className="text-3xl md:text-4xl font-bold mb-2">
           先有"通勤可接受"，再去看房
         </h1>
         <p className="text-muted-foreground">
           {isDual
-            ? "情侣 / 室友模式：找出两个人通勤时间最接近、且都能接受的地铁站。"
+            ? "情侣 / 室友模式：两人各自设定能忍受的通勤时长，找出双方都满意的地铁站。"
             : "搜索你公司的位置，AI 反推通勤等时圈内的所有地铁站。"}
         </p>
       </div>
@@ -143,7 +199,7 @@ export default function MapPage() {
             </div>
             {isDual && (
               <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed">
-                找两人通勤时长最接近、都能接受的站。适合情侣/室友合租。
+                A、B 各自独立设定通勤上限，按「两人时长差小、总时长短」排序。
               </p>
             )}
           </Card>
@@ -176,6 +232,33 @@ export default function MapPage() {
                 <span className="font-medium text-foreground">
                   {companyA.name}
                 </span>
+              </div>
+            </div>
+
+            {/* A 通勤 slider —— 单人模式时也用 */}
+            <div className="mt-4 pt-3 border-t border-border/60">
+              <div className="flex items-baseline justify-between mb-1.5">
+                <span className="text-xs font-semibold flex items-center gap-1.5">
+                  <Clock className="h-3 w-3 text-emerald-600" />
+                  {isDual ? "A 能忍受的通勤" : "你能忍受的通勤"}
+                </span>
+                <span className="text-lg font-bold text-emerald-700 tabular-nums">
+                  ≤ {maxMinutesA}
+                  <span className="text-xs text-muted-foreground font-normal ml-0.5">
+                    分钟
+                  </span>
+                </span>
+              </div>
+              <Slider
+                value={[maxMinutesA]}
+                min={15}
+                max={90}
+                step={5}
+                onValueChange={(v) => setMaxMinutesA(v[0])}
+              />
+              <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                <span>15</span>
+                <span>90 分钟</span>
               </div>
             </div>
           </Card>
@@ -218,48 +301,45 @@ export default function MapPage() {
                   </span>
                 </div>
               </div>
+
+              {/* B 通勤 slider */}
+              <div className="mt-4 pt-3 border-t border-amber-200/60">
+                <div className="flex items-baseline justify-between mb-1.5">
+                  <span className="text-xs font-semibold flex items-center gap-1.5">
+                    <Clock className="h-3 w-3 text-amber-600" />
+                    B 能忍受的通勤
+                  </span>
+                  <span className="text-lg font-bold text-amber-700 tabular-nums">
+                    ≤ {maxMinutesB}
+                    <span className="text-xs text-muted-foreground font-normal ml-0.5">
+                      分钟
+                    </span>
+                  </span>
+                </div>
+                <Slider
+                  value={[maxMinutesB]}
+                  min={15}
+                  max={90}
+                  step={5}
+                  onValueChange={(v) => setMaxMinutesB(v[0])}
+                />
+                <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                  <span>15</span>
+                  <span>90 分钟</span>
+                </div>
+              </div>
             </Card>
           )}
-
-          {/* 通勤时间 */}
-          <Card className="p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Clock className="h-4 w-4 text-sky-700" />
-              <h3 className="font-semibold text-sm">
-                {isDual ? "两人都能忍受的通勤" : "你能忍受的通勤"}
-              </h3>
-            </div>
-            <div className="mb-2 flex items-baseline justify-between">
-              <span className="text-xs text-muted-foreground">单程</span>
-              <span className="text-2xl font-bold text-sky-700 tabular-nums">
-                ≤ {maxMinutes}
-                <span className="text-sm text-muted-foreground font-normal ml-1">
-                  分钟
-                </span>
-              </span>
-            </div>
-            <Slider
-              value={[maxMinutes]}
-              min={20}
-              max={75}
-              step={5}
-              onValueChange={(v) => setMaxMinutes(v[0])}
-            />
-            <div className="flex justify-between text-[10px] text-muted-foreground mt-1.5">
-              <span>20 分钟</span>
-              <span>75 分钟</span>
-            </div>
-          </Card>
 
           {/* 结果汇总 */}
           <Card className="p-4 bg-secondary/30">
             <div className="text-xs text-muted-foreground mb-2">筛选结果</div>
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold tabular-nums text-brand-red-deep">
-                {matchedStations.length}
+                {totalMatched}
               </span>
               <span className="text-sm text-muted-foreground">
-                个{isDual ? "两人都满意的" : "可达"}地铁站
+                个{isDual ? "双方都满意的" : "可达"}地铁站
               </span>
             </div>
             {isDual && dualStations.length > 0 && (
@@ -273,6 +353,12 @@ export default function MapPage() {
                 </span>
               </div>
             )}
+            <div className="mt-2 pt-2 border-t border-border/50 text-[10px] text-muted-foreground leading-relaxed">
+              候选池：{allStations.length} 站
+              {stationSource === "amap" && "（高德实时）"}
+              {stationSource === "cache" && "（本地缓存 24h）"}
+              {stationSource === "fallback" && "（离线兜底，约 30 站）"}
+            </div>
           </Card>
         </div>
 
@@ -284,8 +370,10 @@ export default function MapPage() {
               companyB={companyB}
               singleStations={isDual ? undefined : singleStations}
               dualStations={isDual ? dualStations : undefined}
-              allStations={ALL_STATIONS}
-              maxMinutes={maxMinutes}
+              allStations={allStations}
+              maxMinutes={maxMinutesA}
+              maxMinutesA={maxMinutesA}
+              maxMinutesB={maxMinutesB}
               activeStationId={activeStationId}
               onStationClick={(s) => setActiveStationId(s.id)}
             />
@@ -301,23 +389,25 @@ export default function MapPage() {
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {isDual
-                    ? "按 两人时长差 升序，差越小代表越「公平」"
+                    ? "按「两人时长差」升序，差越小代表越「公平」"
                     : "按 通勤分钟数 升序"}
                 </p>
               </div>
-              <Badge variant="soft">{matchedStations.length} 个</Badge>
+              <Badge variant="soft">
+                {visibleStations.length} / {totalMatched}
+              </Badge>
             </div>
 
-            {matchedStations.length === 0 ? (
+            {totalMatched === 0 ? (
               <div className="text-center py-10 text-sm text-muted-foreground bg-secondary/30 rounded-xl">
                 <Train className="h-6 w-6 mx-auto mb-2 text-muted-foreground/60" />
                 {isDual
-                  ? "没有两人都满足的站，试试放宽通勤时间"
+                  ? "没有两人都满足的站，试试放宽某一方的通勤时间"
                   : "没有符合条件的站，试试放宽通勤时间"}
               </div>
             ) : (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-                {matchedStations.slice(0, 12).map((s: any) => {
+                {visibleStations.map((s: any) => {
                   const active = activeStationId === s.id;
                   const color = pickLineColor(s.line);
                   return (
@@ -342,7 +432,7 @@ export default function MapPage() {
                         </div>
                       </div>
                       <div className="flex flex-wrap gap-1 mb-2">
-                        {expandLines(s.line).map((line) => (
+                        {expandLines(s.line).slice(0, 3).map((line) => (
                           <span
                             key={line}
                             className="text-[9px] px-1.5 py-0.5 rounded font-medium"
@@ -395,9 +485,17 @@ export default function MapPage() {
               </div>
             )}
 
-            {matchedStations.length > 12 && (
-              <div className="text-center mt-3 text-xs text-muted-foreground">
-                还有 {matchedStations.length - 12} 个，地图上可查看全部
+            {hasMore && (
+              <div className="text-center mt-4">
+                <button
+                  onClick={() => setListPage((p) => p + 1)}
+                  className="text-xs font-medium px-4 py-2 rounded-lg bg-secondary hover:bg-secondary/70 transition-colors"
+                >
+                  再加载 {Math.min(LIST_PAGE_SIZE, totalMatched - visibleStations.length)} 个
+                  <span className="text-muted-foreground ml-1">
+                    （还剩 {totalMatched - visibleStations.length}）
+                  </span>
+                </button>
               </div>
             )}
           </Card>

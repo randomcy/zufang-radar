@@ -27,7 +27,11 @@ interface CommuteMapProps {
   dualStations?: DualCommuteStation[];
   /** 所有地铁站（作为灰底） */
   allStations: SubwayStation[];
-  maxMinutes: number;
+  /** 单人模式展示用 */
+  maxMinutes?: number;
+  /** 双人模式展示用 */
+  maxMinutesA?: number;
+  maxMinutesB?: number;
   activeStationId?: string | null;
   onStationClick?: (s: SubwayStation) => void;
 }
@@ -39,6 +43,8 @@ export function CommuteMap({
   dualStations,
   allStations,
   maxMinutes,
+  maxMinutesA,
+  maxMinutesB,
   activeStationId,
   onStationClick,
 }: CommuteMapProps) {
@@ -136,8 +142,25 @@ export function CommuteMap({
       });
     }
 
-    // ---- 1) 所有地铁站 marker ----
-    allStations.forEach((s) => {
+    // ---- 1) 地铁站 marker（超过 120 站时只画范围内 + 远索拉近最近的站）----
+    const ANCHOR = companyA;
+    const distTo = (s: SubwayStation) => {
+      const dx = s.lng - ANCHOR.lng;
+      const dy = s.lat - ANCHOR.lat;
+      return dx * dx + dy * dy; // 无需准确，只用于排序
+    };
+    let stationsToDraw: SubwayStation[];
+    if (allStations.length > 120) {
+      const outOfRange = allStations
+        .filter((s) => !inRangeIds.has(s.id))
+        .sort((a, b) => distTo(a) - distTo(b))
+        .slice(0, 80);
+      const inRange = allStations.filter((s) => inRangeIds.has(s.id));
+      stationsToDraw = [...inRange, ...outOfRange];
+    } else {
+      stationsToDraw = allStations;
+    }
+    stationsToDraw.forEach((s) => {
       const inRange = inRangeIds.has(s.id);
       const active = activeStationId === s.id;
       const lineColor = pickLineColor(s.line);
@@ -343,7 +366,11 @@ export function CommuteMap({
           )}
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 border border-white" />
-            <span>{isDual ? "两人都≤" : "通勤≤"}{maxMinutes}分钟的站</span>
+            <span>
+              {isDual
+                ? `A≤${maxMinutesA ?? 0} · B≤${maxMinutesB ?? 0} 分钟`
+                : `通勤≤${maxMinutes ?? 0} 分钟的站`}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-slate-300" />
