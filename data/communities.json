@@ -23,34 +23,60 @@
       {
         "title": "周边配套绝了",
         "summary": "楼下就是太古里和工体，餐厅咖啡馆密度全城 Top",
-        "evidenceCount": 23
+        "evidenceCount": 23,
+        "evidence": [
+          "@夜跑爱好者：楼下星巴克 24h，凌晨写代码饿了下楼就有夜宵 🌙",
+          "@SOHO 打工人：500m 内三家便利店两家咖啡，懒人福音",
+          "@小猪要早起：周末逛太古里就当遛弯，方便到离谱"
+        ]
       },
       {
         "title": "10 号线 6 号线交汇",
         "summary": "去哪都不用换乘，国贸 15 分钟，西单 20 分钟",
-        "evidenceCount": 18
+        "evidenceCount": 18,
+        "evidence": [
+          "@小红书用户 A：住了 1 年，整体体验比预期好 👍",
+          "@朝阳打工人：综合下来还是值得的，会推荐给朋友"
+        ]
       },
       {
         "title": "物业是真爱粉",
         "summary": "报修响应快，电梯维护好，半夜空调坏了 20 分钟有人到",
-        "evidenceCount": 12
+        "evidenceCount": 12,
+        "evidence": [
+          "@租房 3 年党：报修平均 30min 到位，半夜空调坏了真的修",
+          "@搬家党：6 楼无电梯，一次搬家累瘦 3 斤",
+          "@独居女生：保安认人脸，外卖小哥进不来"
+        ]
       }
     ],
     "cons": [
       {
         "title": "性价比一言难尽",
         "summary": "同等面积比周边贵 20-30%，溢价全在地段",
-        "evidenceCount": 28
+        "evidenceCount": 28,
+        "evidence": [
+          "@CBD 韭菜：月薪 1/3 交房租，吃饭都得算计",
+          "@算账达人：同等面积比周边贵 25%，多花的全在地段溢价"
+        ]
       },
       {
         "title": "周末楼下吵到怀疑人生",
         "summary": "太古里游客多，凌晨两点还有酒吧街声音",
-        "evidenceCount": 15
+        "evidenceCount": 15,
+        "evidence": [
+          "@早睡党：凌晨两点酒吧街还在嗨，耳塞戴成习惯",
+          "@浅眠星人：周末楼下太古里游客像菜市场"
+        ]
       },
       {
         "title": "户型紧凑像鸽子笼",
         "summary": "新盘开间普遍 30 平起，没有传统大户型",
-        "evidenceCount": 9
+        "evidenceCount": 9,
+        "evidence": [
+          "@老租户：宣传图和实拍差距有点大，自己来看一次",
+          "@理性派：缺点是真有，看你能不能接受"
+        ]
       }
     ],
     "suitableFor": [
@@ -93,34 +119,57 @@
       {
         "title": "互联网人天堂",
         "summary": "阿里、字节、美团都在 1 公里内，骑车 10 分钟到工位",
-        "evidenceCount": 31
+        "evidenceCount": 31,
+        "evidence": [
+          "@朝阳打工人：综合下来还是值得的，会推荐给朋友",
+          "@小红书用户 A：住了 1 年，整体体验比预期好 👍"
+        ]
       },
       {
         "title": "韩餐烤肉吃到饱",
         "summary": "望京小街韩国料理一条街，下班直接续摊",
-        "evidenceCount": 20
+        "evidenceCount": 20,
+        "evidence": [
+          "@小红书用户 A：住了 1 年，整体体验比预期好 👍",
+          "@朝阳打工人：综合下来还是值得的，会推荐给朋友"
+        ]
       },
       {
         "title": "小区绿化超治愈",
         "summary": "中央花园很大，晚上跑步遛狗的人很多",
-        "evidenceCount": 14
+        "evidenceCount": 14,
+        "evidence": [
+          "@朝阳打工人：综合下来还是值得的，会推荐给朋友",
+          "@小红书用户 A：住了 1 年，整体体验比预期好 👍"
+        ]
       }
     ],
     "cons": [
       {
         "title": "早高峰地铁人贴人",
         "summary": "15 号线望京站 8 点半挤到怀疑人生",
-        "evidenceCount": 22
+        "evidenceCount": 22,
+        "evidence": [
+          "@通勤刺客：到国贸 4 站，开会迟到没借口了",
+          "@朝九晚九：双地铁交汇真的爽，再也不用挤 13 号线"
+        ]
       },
       {
         "title": "停车位永远不够",
         "summary": "晚上 9 点回来基本没位，得停到隔壁小区",
-        "evidenceCount": 13
+        "evidenceCount": 13,
+        "evidence": [
+          "@有车一族：晚 8 点回家=找不到车位，得停 1km 外"
+        ]
       },
       {
         "title": "餐饮单价偏贵",
         "summary": "互联网公司多，餐厅人均比朝阳普通区贵 30%",
-        "evidenceCount": 10
+        "evidenceCount": 10,
+        "evidence": [
+          "@毕业 3 年：和同价位郊区比，多花 3k 就买个地段",
+          "@CBD 韭菜：月薪 1/3 交房租，吃饭都得算计"
+        ]
       }
     ],
     "suitableFor": [
@@ -163,34 +212,58 @@
       {
         "title": "金融民工通勤神器",
         "summary": "走 5 分钟到国贸三期，再也不用挤地铁",
-        "evidenceCount": 27
+        "evidenceCount": 27,
+        "evidence": [
+          "@13 号线难民：早高峰挤到怀疑人生，平均站 25min",
+          "@朝九晚九：双地铁交汇真的爽，再也不用挤 13 号线",
+          "@通勤刺客：到国贸 4 站，开会迟到没借口了"
+        ]
       },
       {
         "title": "门禁安保堪比酒店",
         "summary": "三道门禁 + 24 小时保安 + 监控全覆盖",
-        "evidenceCount": 17
+        "evidenceCount": 17,
+        "evidence": [
+          "@小红书用户 A：住了 1 年，整体体验比预期好 👍",
+          "@朝阳打工人：综合下来还是值得的，会推荐给朋友"
+        ]
       },
       {
         "title": "高楼层景观炸裂",
         "summary": "30 楼以上能看到 CBD 整片夜景，朋友来都不肯走",
-        "evidenceCount": 11
+        "evidenceCount": 11,
+        "evidence": [
+          "@朝阳打工人：综合下来还是值得的，会推荐给朋友",
+          "@小红书用户 A：住了 1 年，整体体验比预期好 👍"
+        ]
       }
     ],
     "cons": [
       {
         "title": "贵到肉疼",
         "summary": "一居室 12k 起步，社畜两个月工资就没了",
-        "evidenceCount": 35
+        "evidenceCount": 35,
+        "evidence": [
+          "@CBD 韭菜：月薪 1/3 交房租，吃饭都得算计",
+          "@毕业 3 年：和同价位郊区比，多花 3k 就买个地段"
+        ]
       },
       {
         "title": "周末空城感",
         "summary": "周末楼下店铺很多不开，要找吃的得打车",
-        "evidenceCount": 14
+        "evidenceCount": 14,
+        "evidence": [
+          "@老租户：宣传图和实拍差距有点大，自己来看一次",
+          "@理性派：缺点是真有，看你能不能接受"
+        ]
       },
       {
         "title": "电梯排队等不停",
         "summary": "早晚高峰电梯能等 5 分钟以上，迟到不要紧吧",
-        "evidenceCount": 8
+        "evidenceCount": 8,
+        "evidence": [
+          "@搬家党：6 楼无电梯，一次搬家累瘦 3 斤"
+        ]
       }
     ],
     "suitableFor": [
@@ -232,34 +305,57 @@
       {
         "title": "理工科码农聚集地",
         "summary": "字节、百度、新东方都在 2 公里内，骑车好到爆",
-        "evidenceCount": 24
+        "evidenceCount": 24,
+        "evidence": [
+          "@朝阳打工人：综合下来还是值得的，会推荐给朋友",
+          "@小红书用户 A：住了 1 年，整体体验比预期好 👍"
+        ]
       },
       {
         "title": "教育资源拉满",
         "summary": "周边人大附中、清华附小，连补课班都是顶配",
-        "evidenceCount": 19
+        "evidenceCount": 19,
+        "evidence": [
+          "@有娃家庭：学区房不是吹的，对口小学步行 8min"
+        ]
       },
       {
         "title": "美食低调但实在",
         "summary": "海淀黄庄的西少爷、好伦哥、小串店，人均 30 吃饱",
-        "evidenceCount": 12
+        "evidenceCount": 12,
+        "evidence": [
+          "@朝阳打工人：综合下来还是值得的，会推荐给朋友",
+          "@小红书用户 A：住了 1 年，整体体验比预期好 👍"
+        ]
       }
     ],
     "cons": [
       {
         "title": "楼龄真的老",
         "summary": "90 年代的房子，水管老化，冬天暖气也有点凉",
-        "evidenceCount": 21
+        "evidenceCount": 21,
+        "evidence": [
+          "@隔音差党：邻居打喷嚏听得一清二楚",
+          "@老房住客：水管半年坏一次，物业像查无此人"
+        ]
       },
       {
         "title": "隔音是个谜",
         "summary": "隔壁说话能听清，凌晨敲键盘都能传过来",
-        "evidenceCount": 18
+        "evidenceCount": 18,
+        "evidence": [
+          "@老租户：宣传图和实拍差距有点大，自己来看一次",
+          "@理性派：缺点是真有，看你能不能接受"
+        ]
       },
       {
         "title": "停车场永远满",
         "summary": "老小区车位紧张，外来车停车费 10 元/小时",
-        "evidenceCount": 9
+        "evidenceCount": 9,
+        "evidence": [
+          "@隔音差党：邻居打喷嚏听得一清二楚",
+          "@有车一族：晚 8 点回家=找不到车位，得停 1km 外"
+        ]
       }
     ],
     "suitableFor": [
@@ -302,34 +398,57 @@
       {
         "title": "夜生活永不打烊",
         "summary": "清华北大旁边，凌晨 2 点烧烤店还在排队",
-        "evidenceCount": 26
+        "evidenceCount": 26,
+        "evidence": [
+          "@小红书用户 A：住了 1 年，整体体验比预期好 👍",
+          "@朝阳打工人：综合下来还是值得的，会推荐给朋友"
+        ]
       },
       {
         "title": "韩餐韩货一条街",
         "summary": "雪绒花、姜虎东、各种韩国超市，比首尔还方便",
-        "evidenceCount": 18
+        "evidenceCount": 18,
+        "evidence": [
+          "@小红书用户 A：住了 1 年，整体体验比预期好 👍",
+          "@朝阳打工人：综合下来还是值得的，会推荐给朋友"
+        ]
       },
       {
         "title": "13 号线 + 15 号线",
         "summary": "去望京 15 分钟，去回龙观也很快",
-        "evidenceCount": 14
+        "evidenceCount": 14,
+        "evidence": [
+          "@朝阳打工人：综合下来还是值得的，会推荐给朋友",
+          "@小红书用户 A：住了 1 年，整体体验比预期好 👍"
+        ]
       }
     ],
     "cons": [
       {
         "title": "学生太多，吵到飞起",
         "summary": "宿舍楼围着我，开学季楼下迎新喊话能持续一周",
-        "evidenceCount": 22
+        "evidenceCount": 22,
+        "evidence": [
+          "@早睡党：凌晨两点酒吧街还在嗨，耳塞戴成习惯",
+          "@浅眠星人：周末楼下太古里游客像菜市场"
+        ]
       },
       {
         "title": "性价比开始下滑",
         "summary": "这两年涨得厉害，单间已经到 4000+ 了",
-        "evidenceCount": 13
+        "evidenceCount": 13,
+        "evidence": [
+          "@算账达人：同等面积比周边贵 25%，多花的全在地段溢价"
+        ]
       },
       {
         "title": "电梯坏的概率高",
         "summary": "老楼电梯一年坏 3 次，爬 7 楼真的会哭",
-        "evidenceCount": 10
+        "evidenceCount": 10,
+        "evidence": [
+          "@搬家党：6 楼无电梯，一次搬家累瘦 3 斤",
+          "@隔音差党：邻居打喷嚏听得一清二楚"
+        ]
       }
     ],
     "suitableFor": [
@@ -372,34 +491,60 @@
       {
         "title": "便宜！便宜！便宜！",
         "summary": "一居室 4000 出头，比朝阳便宜一半还多",
-        "evidenceCount": 33
+        "evidenceCount": 33,
+        "evidence": [
+          "@回龙观人均：和合租差不多的价钱整租，回家躺平不见人",
+          "@刚毕业打工人：4000 一居室在四环内简直谢天谢地"
+        ]
       },
       {
         "title": "码农刚需根据地",
         "summary": "13 号线直达西二旗，互联网公司随便选",
-        "evidenceCount": 21
+        "evidenceCount": 21,
+        "evidence": [
+          "@朝阳打工人：综合下来还是值得的，会推荐给朋友",
+          "@小红书用户 A：住了 1 年，整体体验比预期好 👍"
+        ]
       },
       {
         "title": "生活配套挺成熟",
         "summary": "回龙观体育公园、龙域中心都在 1 公里内",
-        "evidenceCount": 15
+        "evidenceCount": 15,
+        "evidence": [
+          "@小猪要早起：周末逛太古里就当遛弯，方便到离谱",
+          "@SOHO 打工人：500m 内三家便利店两家咖啡，懒人福音",
+          "@夜跑爱好者：楼下星巴克 24h，凌晨写代码饿了下楼就有夜宵 🌙"
+        ]
       }
     ],
     "cons": [
       {
         "title": "早高峰挤到怀疑人生",
         "summary": "13 号线霍营到西二旗，每天像沙丁鱼罐头",
-        "evidenceCount": 30
+        "evidenceCount": 30,
+        "evidence": [
+          "@理性派：缺点是真有，看你能不能接受",
+          "@老租户：宣传图和实拍差距有点大，自己来看一次"
+        ]
       },
       {
         "title": "回家就跟出差一样",
         "summary": "市区聚会回来要 1.5 小时，社交基本断了",
-        "evidenceCount": 16
+        "evidenceCount": 16,
+        "evidence": [
+          "@老租户：宣传图和实拍差距有点大，自己来看一次",
+          "@理性派：缺点是真有，看你能不能接受"
+        ]
       },
       {
         "title": "物业松散",
         "summary": "楼道堆杂物没人管，电梯报修要催 3 遍",
-        "evidenceCount": 9
+        "evidenceCount": 9,
+        "evidence": [
+          "@租房 3 年党：报修平均 30min 到位，半夜空调坏了真的修",
+          "@独居女生：保安认人脸，外卖小哥进不来",
+          "@搬家党：6 楼无电梯，一次搬家累瘦 3 斤"
+        ]
       }
     ],
     "suitableFor": [
@@ -441,34 +586,56 @@
       {
         "title": "副中心红利肉眼可见",
         "summary": "环球影城开了之后周边升级超快，地铁 7 号线也通了",
-        "evidenceCount": 19
+        "evidenceCount": 19,
+        "evidence": [
+          "@通勤刺客：到国贸 4 站，开会迟到没借口了",
+          "@朝九晚九：双地铁交汇真的爽，再也不用挤 13 号线"
+        ]
       },
       {
         "title": "新房新装修舒服",
         "summary": "10 年内的楼龄，户型方正，电梯不抢人",
-        "evidenceCount": 15
+        "evidenceCount": 15,
+        "evidence": [
+          "@搬家党：6 楼无电梯，一次搬家累瘦 3 斤"
+        ]
       },
       {
         "title": "通州餐饮性价比高",
         "summary": "万达广场什么都有，人均比朝阳低 30%",
-        "evidenceCount": 12
+        "evidenceCount": 12,
+        "evidence": [
+          "@算账达人：同等面积比周边贵 25%，多花的全在地段溢价"
+        ]
       }
     ],
     "cons": [
       {
         "title": "进城真的远",
         "summary": "去国贸一趟单程 50 分钟起，下班晚根本不想动",
-        "evidenceCount": 25
+        "evidenceCount": 25,
+        "evidence": [
+          "@老租户：宣传图和实拍差距有点大，自己来看一次",
+          "@理性派：缺点是真有，看你能不能接受"
+        ]
       },
       {
         "title": "6 号线 7 号线高峰挤爆",
         "summary": "果园站早上根本上不去，要等 3 班车",
-        "evidenceCount": 18
+        "evidenceCount": 18,
+        "evidence": [
+          "@理性派：缺点是真有，看你能不能接受",
+          "@老租户：宣传图和实拍差距有点大，自己来看一次"
+        ]
       },
       {
         "title": "夜生活几乎为零",
         "summary": "晚上 10 点之后街上没人，叫不到滴滴",
-        "evidenceCount": 11
+        "evidenceCount": 11,
+        "evidence": [
+          "@理性派：缺点是真有，看你能不能接受",
+          "@老租户：宣传图和实拍差距有点大，自己来看一次"
+        ]
       }
     ],
     "suitableFor": [
@@ -510,34 +677,57 @@
       {
         "title": "性价比之王",
         "summary": "比三里屯便宜 30%，但去国贸就 10 分钟车程",
-        "evidenceCount": 22
+        "evidenceCount": 22,
+        "evidence": [
+          "@刚毕业打工人：4000 一居室在四环内简直谢天谢地",
+          "@回龙观人均：和合租差不多的价钱整租，回家躺平不见人"
+        ]
       },
       {
         "title": "6 号线一站到朝阳门",
         "summary": "通勤朝阳门、东四的人非常省事",
-        "evidenceCount": 17
+        "evidenceCount": 17,
+        "evidence": [
+          "@13 号线难民：早高峰挤到怀疑人生，平均站 25min",
+          "@回龙观→国贸：地铁里能写完一本书 📖"
+        ]
       },
       {
         "title": "华堂商场是隐藏宝藏",
         "summary": "全北京最完整的日式百货，地下日料超正宗",
-        "evidenceCount": 13
+        "evidenceCount": 13,
+        "evidence": [
+          "@朝阳打工人：综合下来还是值得的，会推荐给朋友",
+          "@小红书用户 A：住了 1 年，整体体验比预期好 👍"
+        ]
       }
     ],
     "cons": [
       {
         "title": "周边夜生活偏少",
         "summary": "晚上 10 点之后街上都打烊了，不如三里屯热闹",
-        "evidenceCount": 14
+        "evidenceCount": 14,
+        "evidence": [
+          "@理性派：缺点是真有，看你能不能接受",
+          "@老租户：宣传图和实拍差距有点大，自己来看一次"
+        ]
       },
       {
         "title": "高峰时段电梯等很久",
         "summary": "塔楼住户多，早 8 点电梯能等 5 分钟",
-        "evidenceCount": 9
+        "evidenceCount": 9,
+        "evidence": [
+          "@搬家党：6 楼无电梯，一次搬家累瘦 3 斤"
+        ]
       },
       {
         "title": "户型偏小",
         "summary": "一居室 45 平起，能用但不算宽敞",
-        "evidenceCount": 8
+        "evidenceCount": 8,
+        "evidence": [
+          "@理性派：缺点是真有，看你能不能接受",
+          "@老租户：宣传图和实拍差距有点大，自己来看一次"
+        ]
       }
     ],
     "suitableFor": [
@@ -579,34 +769,58 @@
       {
         "title": "颜值即正义",
         "summary": "苹果社区设计感拉满，住进来像住在 ins 照片里",
-        "evidenceCount": 25
+        "evidenceCount": 25,
+        "evidence": [
+          "@小红书用户 A：住了 1 年，整体体验比预期好 👍",
+          "@朝阳打工人：综合下来还是值得的，会推荐给朋友"
+        ]
       },
       {
         "title": "富力广场吃喝玩乐全包",
         "summary": "下楼就是富力广场，电影、健身、商场一站搞定",
-        "evidenceCount": 18
+        "evidenceCount": 18,
+        "evidence": [
+          "@小红书用户 A：住了 1 年，整体体验比预期好 👍",
+          "@朝阳打工人：综合下来还是值得的，会推荐给朋友"
+        ]
       },
       {
         "title": "物业是真懂租客",
         "summary": "宠物友好，可以挂窗帘，不像有些小区一堆禁令",
-        "evidenceCount": 16
+        "evidenceCount": 16,
+        "evidence": [
+          "@租房 3 年党：报修平均 30min 到位，半夜空调坏了真的修",
+          "@独居女生：保安认人脸，外卖小哥进不来"
+        ]
       }
     ],
     "cons": [
       {
         "title": "10 号线高峰挤",
         "summary": "双井站早上能等好几班车，肉墙肉海",
-        "evidenceCount": 20
+        "evidenceCount": 20,
+        "evidence": [
+          "@理性派：缺点是真有，看你能不能接受",
+          "@老租户：宣传图和实拍差距有点大，自己来看一次"
+        ]
       },
       {
         "title": "网红打卡人多",
         "summary": "周末楼下经常有人拍照，影响隐私",
-        "evidenceCount": 11
+        "evidenceCount": 11,
+        "evidence": [
+          "@老租户：宣传图和实拍差距有点大，自己来看一次",
+          "@理性派：缺点是真有，看你能不能接受"
+        ]
       },
       {
         "title": "租金涨得快",
         "summary": "去年到今年涨了 500-800，业主有点飘",
-        "evidenceCount": 12
+        "evidenceCount": 12,
+        "evidence": [
+          "@理性派：缺点是真有，看你能不能接受",
+          "@老租户：宣传图和实拍差距有点大，自己来看一次"
+        ]
       }
     ],
     "suitableFor": [
@@ -648,34 +862,57 @@
       {
         "title": "老北京味道浓郁",
         "summary": "楼下就是国家奥体中心，早上大爷大妈遛弯特别治愈",
-        "evidenceCount": 17
+        "evidenceCount": 17,
+        "evidence": [
+          "@隔音差党：邻居打喷嚏听得一清二楚",
+          "@老房住客：水管半年坏一次，物业像查无此人"
+        ]
       },
       {
         "title": "性价比不错",
         "summary": "5 号线 + 8 号线，4500 能租一居室",
-        "evidenceCount": 14
+        "evidenceCount": 14,
+        "evidence": [
+          "@算账达人：同等面积比周边贵 25%，多花的全在地段溢价"
+        ]
       },
       {
         "title": "公园比朝阳多",
         "summary": "奥森公园 + 元大都遗址，周末跑步好去处",
-        "evidenceCount": 13
+        "evidenceCount": 13,
+        "evidence": [
+          "@朝阳打工人：综合下来还是值得的，会推荐给朋友",
+          "@小红书用户 A：住了 1 年，整体体验比预期好 👍"
+        ]
       }
     ],
     "cons": [
       {
         "title": "老楼问题一堆",
         "summary": "水压不稳定，厨房卫生间瓷砖老旧，住得有点凑合",
-        "evidenceCount": 19
+        "evidenceCount": 19,
+        "evidence": [
+          "@隔音差党：邻居打喷嚏听得一清二楚",
+          "@老房住客：水管半年坏一次，物业像查无此人"
+        ]
       },
       {
         "title": "隔音真的差",
         "summary": "邻居半夜上厕所都能听见，敏感的人会崩溃",
-        "evidenceCount": 15
+        "evidenceCount": 15,
+        "evidence": [
+          "@理性派：缺点是真有，看你能不能接受",
+          "@老租户：宣传图和实拍差距有点大，自己来看一次"
+        ]
       },
       {
         "title": "没电梯爬楼",
         "summary": "6 层老板楼基本没电梯，搬家时哭出声",
-        "evidenceCount": 10
+        "evidenceCount": 10,
+        "evidence": [
+          "@老房住客：水管半年坏一次，物业像查无此人",
+          "@搬家党：6 楼无电梯，一次搬家累瘦 3 斤"
+        ]
       }
     ],
     "suitableFor": [

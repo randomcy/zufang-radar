@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
-import { ThumbsUp, ThumbsDown, FileSearch } from "lucide-react";
+import { ThumbsUp, ThumbsDown, FileSearch, Quote } from "lucide-react";
 import type { Community, Post } from "@/types";
 import { extractKeywords } from "@/lib/postTopics";
 import { PostsSection } from "./PostsSection";
@@ -65,11 +65,21 @@ export function CommunityInteractive({ community, posts }: Props) {
                 <p className="text-xs text-muted-foreground leading-relaxed mt-1">
                   {p.summary}
                 </p>
+                {p.evidence && p.evidence.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {p.evidence.slice(0, 2).map((q, qi) => (
+                      <div key={qi} className="flex items-start gap-1.5 text-[11px] text-emerald-900/70 leading-snug bg-emerald-50/50 rounded px-2 py-1">
+                        <Quote className="h-2.5 w-2.5 mt-0.5 shrink-0 text-emerald-500" />
+                        <span>{q}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </button>
             ))}
           </div>
           <p className="text-[10px] text-muted-foreground/70 mt-3 text-center">
-            点击任意条目查看支撑帖子
+            点击任意条目查看全部支撑帖子
           </p>
         </Card>
 
@@ -100,11 +110,21 @@ export function CommunityInteractive({ community, posts }: Props) {
                 <p className="text-xs text-muted-foreground leading-relaxed mt-1">
                   {c.summary}
                 </p>
+                {c.evidence && c.evidence.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {c.evidence.slice(0, 2).map((q, qi) => (
+                      <div key={qi} className="flex items-start gap-1.5 text-[11px] text-rose-900/70 leading-snug bg-rose-50/50 rounded px-2 py-1">
+                        <Quote className="h-2.5 w-2.5 mt-0.5 shrink-0 text-rose-500" />
+                        <span>{q}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </button>
             ))}
           </div>
           <p className="text-[10px] text-muted-foreground/70 mt-3 text-center">
-            点击任意条目查看支撑帖子
+            点击任意条目查看全部支撑帖子
           </p>
         </Card>
       </div>

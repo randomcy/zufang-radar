@@ -18,6 +18,7 @@ import {
   Heart,
   Search,
   X,
+  AlertTriangle,
 } from "lucide-react";
 
 import stationsData from "../../../data/subway-stations.json";
@@ -380,6 +381,22 @@ export default function MapPage() {
                           分钟
                         </span>
                       </div>
+                      {active && (apt as any).hidden_cons && (apt as any).hidden_cons.length > 0 && (
+                        <div className="mt-2.5 pt-2.5 border-t border-amber-200/60">
+                          <div className="flex items-center gap-1 text-[10px] font-semibold text-amber-700 uppercase tracking-wider mb-1">
+                            <AlertTriangle className="h-2.5 w-2.5" />
+                            中介不会告诉你的
+                          </div>
+                          <ul className="space-y-0.5">
+                            {((apt as any).hidden_cons as string[]).map((hc, hi) => (
+                              <li key={hi} className="text-[11px] text-amber-900/85 leading-snug flex gap-1">
+                                <span className="text-amber-500">•</span>
+                                <span>{hc}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </button>
                   );
                 })}

@@ -32,6 +32,7 @@ export interface ProsCons {
   title: string;
   summary: string;
   evidenceCount: number;
+  evidence?: string[];
 }
 
 export interface Community {

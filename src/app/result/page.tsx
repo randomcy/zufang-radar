@@ -26,6 +26,8 @@ import {
 import { usePreferenceStore } from "@/store/preference";
 import conjointConfig from "../../../data/conjoint-config.json";
 import type { ConjointConfig, PreferenceResult } from "@/types";
+import { AntiBrokerWidget } from "@/components/result/AntiBrokerWidget";
+import { ShareCard } from "@/components/result/ShareCard";
 
 // ============================================================
 // 工具：把 PreferenceResult 转为雷达图数据
@@ -318,6 +320,12 @@ function QuizResult() {
           </p>
         </div>
       </Card>
+
+      {/* 分享卡 9:16 海报 */}
+      <ShareCard result={result} />
+
+      {/* 反中介话术 widget */}
+      <AntiBrokerWidget />
 
       {/* 重测按钮 */}
       <div className="mt-6 flex justify-center">
