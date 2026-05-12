@@ -17,6 +17,10 @@ interface CommuteMapProps {
   maxMinutes: number;
   onApartmentClick?: (apt: Apartment) => void;
   activeApartmentId?: string | null;
+  /** 可选：用户自己填的 高德 JSAPI key */
+  apiKey?: string;
+  /** 可选：用户自己填的 高德 安全密钥 */
+  securityCode?: string;
 }
 
 declare global {
@@ -33,6 +37,8 @@ export function CommuteMap({
   maxMinutes,
   onApartmentClick,
   activeApartmentId,
+  apiKey,
+  securityCode,
 }: CommuteMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
@@ -41,21 +47,31 @@ export function CommuteMap({
   const [mapReady, setMapReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // ===== 初始化地图（仅一次）=====
+  // ===== 初始化地图（key 变化时重新初始化）=====
   useEffect(() => {
     if (!containerRef.current) return;
-    const key = process.env.NEXT_PUBLIC_AMAP_KEY;
+    const key = apiKey || process.env.NEXT_PUBLIC_AMAP_KEY;
+    const sec = securityCode || "";
     if (!key) {
-      setError("缺少高德地图 Key（请配置 NEXT_PUBLIC_AMAP_KEY）");
+      setError("请填入你的高德地图 JSAPI key");
       setLoading(false);
       return;
     }
 
-    // 高德要求设置 securityJsCode，公开 demo 用 demo 占位
+    // 高德 2.0 必填安全密钥
     (window as any)._AMapSecurityConfig = {
-      securityJsCode: "",
+      securityJsCode: sec,
     };
 
+    // 如果之前加载过不同的 key，清掉旧的 AMap 全局
+    if ((window as any).AMap && mapRef.current) {
+      try { mapRef.current.destroy(); } catch {}
+      mapRef.current = null;
+    }
+
+    setLoading(true);
+    setError(null);
+    AMapLoader.reset();
     AMapLoader.load({
       key,
       version: "2.0",
@@ -82,12 +98,12 @@ export function CommuteMap({
 
     return () => {
       if (mapRef.current) {
-        mapRef.current.destroy();
+        try { mapRef.current.destroy(); } catch {}
         mapRef.current = null;
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [apiKey, securityCode]);
 
   // ===== 重新画 overlays（公司/地铁/房源/等时圈）=====
   useEffect(() => {

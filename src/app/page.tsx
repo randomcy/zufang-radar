@@ -8,7 +8,6 @@ import {
   ArrowRight,
   Compass,
   Brain,
-  Scale,
 } from "lucide-react";
 
 export default function HomePage() {
@@ -57,37 +56,37 @@ export default function HomePage() {
                 <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
                 <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-white/80 mb-2">
                   <Brain className="h-3.5 w-3.5" />
-                  探索型
+                  第一步 · 弄清自己
                 </div>
-                <div className="text-lg font-bold">我还不知道自己想要什么</div>
+                <div className="text-lg font-bold">2 分钟租房人格测试</div>
                 <div className="text-sm text-white/80 mt-1 leading-relaxed">
-                  8 道虚构房源选择题 → 帮你反推隐性偏好
+                  8 道虚构房源选择题 → 反推你说不清的隐性偏好
                 </div>
                 <div className="mt-3 inline-flex items-center gap-1 text-xs font-medium">
-                  开始人格测试 <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+                  开始测试 <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Link>
               <Link
-                href="/decide"
+                href="/map"
                 className="group relative rounded-2xl bg-foreground text-background p-5 text-left shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all overflow-hidden"
               >
-                <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-brand-red/20 blur-2xl" />
-                <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-brand-red mb-2">
-                  <Scale className="h-3.5 w-3.5" />
-                  纠结型
+                <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-sky-400/30 blur-2xl" />
+                <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-sky-300 mb-2">
+                  <Compass className="h-3.5 w-3.5" />
+                  第二步 · 圈定范围
                 </div>
-                <div className="text-lg font-bold">我在两套房里纠结</div>
+                <div className="text-lg font-bold">还原你的通勤地图</div>
                 <div className="text-sm text-background/70 mt-1 leading-relaxed">
-                  上传两套候选 → AI 检测差异 → 针对性出 6 题拍板
+                  搜公司地点 → 创建等时圈 → 检出可接受的地铁站和房源
                 </div>
                 <div className="mt-3 inline-flex items-center gap-1 text-xs font-medium">
-                  开启决策助手 <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+                  查看地图 <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Link>
             </div>
 
             <div className="mt-6 text-xs text-muted-foreground">
-              任选一个场景开始，均不超过 2 分钟
+              全部以真实北京小区·真实地铁·真实口碑为数据底座
             </div>
           </div>
         </div>
@@ -98,7 +97,7 @@ export default function HomePage() {
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-brand-red-deep mb-3">
             <Sparkles className="h-3.5 w-3.5" />
-            四个真实痛点，四个核心功能
+            三个真实痛点，三个核心功能
           </div>
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
             不做又一个房源信息聚合
@@ -108,7 +107,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           {/* 功能一 */}
           <Card className="p-7 hover:shadow-card-hover transition-all duration-300 group cursor-pointer relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-brand-red/5 rounded-full -translate-y-12 translate-x-12 group-hover:scale-150 transition-transform duration-500" />
@@ -127,27 +126,6 @@ export default function HomePage() {
                 className="inline-flex items-center gap-1 text-sm font-medium text-brand-red-deep group-hover:gap-2 transition-all"
               >
                 开始人格测试 <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
-          </Card>
-
-          {/* 功能四·决策助手 */}
-          <Card className="p-7 hover:shadow-card-hover transition-all duration-300 group cursor-pointer relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-rose-100 rounded-full -translate-y-12 translate-x-12 group-hover:scale-150 transition-transform duration-500" />
-            <div className="relative">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-rose-700 mb-5">
-                <Scale className="h-6 w-6" />
-              </div>
-              <div className="text-xs font-semibold text-rose-700 mb-1">场景 B</div>
-              <h3 className="text-xl font-bold mb-2">两套房决策助手</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                面对两个具体房源不知选哪个？上传后 AI 检测<span className="font-medium text-foreground">真实差异维度</span>，针对性出题，决策完还能复用你的偏好画像。
-              </p>
-              <Link
-                href="/decide"
-                className="inline-flex items-center gap-1 text-sm font-medium text-rose-700 group-hover:gap-2 transition-all"
-              >
-                开启决策助手 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
           </Card>
@@ -210,28 +188,28 @@ export default function HomePage() {
           </div>
           <div className="grid md:grid-cols-4 gap-6">
             <div className="text-center">
-              <div className="text-3xl font-bold text-brand-red-deep">30</div>
-              <div className="text-xs font-medium mt-1">虚构房源</div>
-              <div className="text-[10px] text-muted-foreground mt-0.5">覆盖 6 大区·5 价段</div>
-            </div>
-            <div className="text-center">
               <div className="text-3xl font-bold text-brand-red-deep">10</div>
-              <div className="text-xs font-medium mt-1">北京小区</div>
-              <div className="text-[10px] text-muted-foreground mt-0.5">从三里屯到回龙观</div>
+              <div className="text-xs font-medium mt-1">真实北京小区</div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">从三里屯 SOHO 到龙泽苑</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-brand-red-deep">66</div>
-              <div className="text-xs font-medium mt-1">AI 预生成题面池</div>
-              <div className="text-[10px] text-muted-foreground mt-0.5">7 维度 × 3 差距级别</div>
+              <div className="text-3xl font-bold text-brand-red-deep">30</div>
+              <div className="text-xs font-medium mt-1">示例房源</div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">挂靠真实小区·贴合市场价</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-brand-red-deep">34+</div>
-              <div className="text-xs font-medium mt-1">小红书真实声音</div>
+              <div className="text-3xl font-bold text-brand-red-deep">高德</div>
+              <div className="text-xs font-medium mt-1">真实地点搜索</div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">等时圈·20+ 地铁站点位</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-brand-red-deep">30+</div>
+              <div className="text-xs font-medium mt-1">小红书风格证言</div>
               <div className="text-[10px] text-muted-foreground mt-0.5">好评·吐槽·抱怨混合</div>
             </div>
           </div>
           <p className="text-center text-xs text-muted-foreground mt-6 max-w-2xl mx-auto">
-            本 demo 数据均为虚构。重点在产品逻辑·算法设计·AI 交互，上线后可接入真实小红书笔记 · 房源 API。
+            小区基础信息·口碑的取自贝壳/安居客/房天下等公开评价。示例房源价格·标题为演示虚构。
           </p>
         </Card>
       </section>

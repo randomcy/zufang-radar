@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
@@ -13,16 +13,17 @@ import {
   Building,
   Train,
   Clock,
-  MapPin,
   Sparkles,
   Heart,
   Search,
-  X,
   AlertTriangle,
+  Settings,
+  Key,
+  ExternalLink,
+  MapPin,
 } from "lucide-react";
 
 import stationsData from "../../../data/subway-stations.json";
-import companiesData from "../../../data/sample-companies.json";
 import apartmentsData from "../../../data/apartments.json";
 
 import {
@@ -33,8 +34,16 @@ import {
 } from "@/lib/commute";
 import { usePreferenceStore } from "@/store/preference";
 import type { Apartment } from "@/types";
+const PlaceSearch = dynamic(
+  () => import("@/components/map/PlaceSearch").then((m) => m.PlaceSearch),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-10 bg-secondary/40 rounded-xl animate-pulse" />
+    ),
+  }
+);
 
-// 地图组件 SSR 不友好（依赖 window），用 dynamic 关掉 SSR
 const CommuteMap = dynamic(
   () => import("@/components/map/CommuteMap").then((m) => m.CommuteMap),
   {
@@ -51,11 +60,22 @@ const CommuteMap = dynamic(
 );
 
 const ALL_STATIONS = stationsData as SubwayStation[];
-const COMPANIES = companiesData as Company[];
 const ALL_APARTMENTS = apartmentsData as Apartment[];
 
+// 一个示例公司兜底，让首次进来就能看到地图
+const DEFAULT_COMPANY: Company = {
+  id: "default",
+  name: "示例 · 国贸 CBD",
+  lng: 116.4602,
+  lat: 39.9085,
+};
+
 export default function MapPage() {
-  const [companyId, setCompanyId] = useState<string>("xiaohongshu");
+  const [apiKey, setApiKey] = useState<string>("");
+  const [securityCode, setSecurityCode] = useState<string>("");
+  const [showKeyPanel, setShowKeyPanel] = useState<boolean>(false);
+  const [company, setCompany] = useState<Company>(DEFAULT_COMPANY);
+
   const [maxMinutes, setMaxMinutes] = useState<number>(40);
   const [budgetMax, setBudgetMax] = useState<number>(10000);
   const [activeAptId, setActiveAptId] = useState<string | null>(null);
@@ -64,10 +84,29 @@ export default function MapPage() {
   const pref = usePreferenceStore((s) => s.result);
   const binaryPrefs = usePreferenceStore((s) => s.binaryPreferences);
 
-  const company = useMemo(
-    () => COMPANIES.find((c) => c.id === companyId)!,
-    [companyId]
-  );
+  // ===== 从 localStorage 恢复 key =====
+  useEffect(() => {
+    const savedKey = localStorage.getItem("amap_jsapi_key") || "";
+    const savedSec = localStorage.getItem("amap_security_code") || "";
+    if (savedKey) setApiKey(savedKey);
+    if (savedSec) setSecurityCode(savedSec);
+    // 没填的话默认把 key 输入面板展开
+    if (!savedKey) setShowKeyPanel(true);
+  }, []);
+
+  // ===== 保存 key 到 localStorage =====
+  const handleSaveKey = () => {
+    localStorage.setItem("amap_jsapi_key", apiKey);
+    localStorage.setItem("amap_security_code", securityCode);
+    setShowKeyPanel(false);
+  };
+
+  const handleClearKey = () => {
+    localStorage.removeItem("amap_jsapi_key");
+    localStorage.removeItem("amap_security_code");
+    setApiKey("");
+    setSecurityCode("");
+  };
 
   // ===== 等时圈内的地铁站 =====
   const stationsInRange = useMemo(
@@ -77,21 +116,16 @@ export default function MapPage() {
 
   // ===== 等时圈附近的房源（基础筛选） =====
   const aptsBase = useMemo(() => {
-    const near = apartmentsNearStations(
-      ALL_APARTMENTS,
-      stationsInRange,
-      1000
-    );
+    const near = apartmentsNearStations(ALL_APARTMENTS, stationsInRange, 1000);
     return near.filter((apt) => apt.price <= budgetMax);
   }, [stationsInRange, budgetMax]);
 
-  // ===== 加入硬筛选偏好（独卫/养宠/阳台/电梯/近地铁）=====
+  // ===== 叠加硬筛选偏好 =====
   const aptsAfterBinary = useMemo(() => {
     if (!usePref || !binaryPrefs || Object.keys(binaryPrefs).length === 0) {
       return aptsBase;
     }
     return aptsBase.filter((apt) => {
-      // 把 binaryPrefs 里值为 true 的标签都要求命中
       for (const [key, val] of Object.entries(binaryPrefs)) {
         if (!val) continue;
         const tagMap: Record<string, string> = {
@@ -110,6 +144,8 @@ export default function MapPage() {
 
   const filteredApts = aptsAfterBinary;
 
+  const hasKey = apiKey.length > 0;
+
   return (
     <div className="container py-8 md:py-10 max-w-7xl">
       <Link
@@ -120,7 +156,6 @@ export default function MapPage() {
         返回首页
       </Link>
 
-      {/* ===== 头部 ===== */}
       <div className="mb-6">
         <div className="text-xs text-sky-700 font-semibold uppercase tracking-widest mb-2">
           功能二 · 通勤地图
@@ -129,37 +164,134 @@ export default function MapPage() {
           先有"通勤可接受"，再有"房源选择"
         </h1>
         <p className="text-muted-foreground">
-          输入公司位置和能忍受的通勤时间，AI 反推符合的地铁站，并叠加预算和偏好筛选。
+          搜索你公司或学校的真实地点，AI 反推通勤等时圈内的地铁站，叠加预算和偏好筛选房源。
         </p>
       </div>
 
       <div className="grid lg:grid-cols-[360px_1fr] gap-5">
         {/* ===== 左侧控制面板 ===== */}
         <div className="space-y-4">
-          {/* 1) 公司选择 */}
+          {/* 0) 高德 key 配置 */}
+          <Card
+            className={`p-4 ${
+              hasKey
+                ? "bg-emerald-50/30 border-emerald-200/60"
+                : "bg-amber-50/40 border-amber-200/60"
+            }`}
+          >
+            <button
+              onClick={() => setShowKeyPanel((v) => !v)}
+              className="w-full flex items-center justify-between text-left"
+            >
+              <div className="flex items-center gap-2">
+                <Key
+                  className={`h-4 w-4 ${
+                    hasKey ? "text-emerald-700" : "text-amber-700"
+                  }`}
+                />
+                <h3 className="font-semibold text-sm">
+                  {hasKey ? "已配置高德地图" : "请先配置高德地图 key"}
+                </h3>
+              </div>
+              <Settings className="h-3.5 w-3.5 text-muted-foreground" />
+            </button>
+
+            {showKeyPanel && (
+              <div className="mt-3 space-y-2.5">
+                <div>
+                  <label className="text-[11px] text-muted-foreground block mb-1">
+                    JSAPI Key
+                  </label>
+                  <Input
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value.trim())}
+                    placeholder="32 位字符"
+                    className="text-xs font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] text-muted-foreground block mb-1">
+                    安全密钥（JS Code）
+                  </label>
+                  <Input
+                    value={securityCode}
+                    onChange={(e) => setSecurityCode(e.target.value.trim())}
+                    placeholder="32 位字符"
+                    className="text-xs font-mono"
+                  />
+                </div>
+                <div className="flex gap-2 pt-1">
+                  <Button
+                    size="sm"
+                    className="flex-1"
+                    onClick={handleSaveKey}
+                    disabled={!apiKey}
+                  >
+                    保存到本地
+                  </Button>
+                  {hasKey && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleClearKey}
+                    >
+                      清除
+                    </Button>
+                  )}
+                </div>
+                <a
+                  href="https://console.amap.com/dev/key/app"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1 text-[11px] text-sky-700 hover:underline pt-1"
+                >
+                  没有 key？去高德开放平台免费申请
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+                <p className="text-[10px] text-muted-foreground leading-relaxed">
+                  类型选「Web 端 (JS API)」，免费版每日 5000 次足够日常使用。key
+                  仅保存在你浏览器本地，不上传服务器。
+                </p>
+              </div>
+            )}
+          </Card>
+
+          {/* 1) 搜公司 */}
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-3">
               <Building className="h-4 w-4 text-sky-700" />
-              <h3 className="font-semibold text-sm">第 1 步 · 你的公司在哪</h3>
+              <h3 className="font-semibold text-sm">第 1 步 · 搜你的公司位置</h3>
             </div>
-            <div className="grid gap-1.5">
-              {COMPANIES.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => setCompanyId(c.id)}
-                  className={`text-left px-3 py-2 rounded-lg border text-sm transition-all ${
-                    companyId === c.id
-                      ? "bg-sky-50 border-sky-300 text-sky-900"
-                      : "bg-white border-border hover:border-sky-200 hover:bg-sky-50/40"
-                  }`}
-                >
-                  <div className="font-medium truncate">{c.name}</div>
-                  <div className="text-[10px] text-muted-foreground truncate">
-                    {c.address}
+            {hasKey ? (
+              <>
+                <PlaceSearch
+                  apiKey={apiKey}
+                  securityCode={securityCode}
+                  onPick={(p) =>
+                    setCompany({
+                      id: p.id,
+                      name: p.name,
+                      lng: p.location.lng,
+                      lat: p.location.lat,
+                    })
+                  }
+                  placeholder="搜小红书 / 字节跳动 / 你家小区…"
+                />
+                <div className="mt-2.5 flex items-start gap-2 text-[11px] text-muted-foreground bg-secondary/40 rounded-lg p-2">
+                  <MapPin className="h-3 w-3 mt-0.5 text-sky-600 shrink-0" />
+                  <div className="leading-relaxed">
+                    当前地点：
+                    <span className="font-medium text-foreground">
+                      {company.name}
+                    </span>
                   </div>
-                </button>
-              ))}
-            </div>
+                </div>
+              </>
+            ) : (
+              <div className="text-xs text-muted-foreground bg-secondary/40 rounded-lg p-3 leading-relaxed">
+                配置 key 后即可在此搜索<span className="font-medium">你公司、学校或任何北京真实地点</span>，AI 围绕这个点画通勤等时圈。
+              </div>
+            )}
           </Card>
 
           {/* 2) 通勤时间 */}
@@ -217,7 +349,7 @@ export default function MapPage() {
             </div>
           </Card>
 
-          {/* 4) 偏好画像（如果有的话） */}
+          {/* 4) 偏好画像 */}
           {pref && Object.values(binaryPrefs || {}).some(Boolean) && (
             <Card className="p-4 border-brand-red/20 bg-brand-red-pale/10">
               <div className="flex items-start gap-3 mb-3">
@@ -271,9 +403,7 @@ export default function MapPage() {
 
           {!pref && (
             <Card className="p-4 bg-gradient-to-br from-brand-red-pale/30 to-rose-50 border-brand-red/10">
-              <h3 className="font-semibold text-sm mb-1">
-                还没做过人格测试？
-              </h3>
+              <h3 className="font-semibold text-sm mb-1">还没做过人格测试？</h3>
               <p className="text-xs text-muted-foreground mb-3">
                 做完后可以把"必须有独卫/阳台"这些硬条件叠加到地图筛选。
               </p>
@@ -305,7 +435,6 @@ export default function MapPage() {
 
         {/* ===== 右侧地图 + 房源列表 ===== */}
         <div className="space-y-4">
-          {/* 地图 */}
           <div className="h-[440px] md:h-[520px]">
             <CommuteMap
               company={company}
@@ -315,6 +444,8 @@ export default function MapPage() {
               maxMinutes={maxMinutes}
               onApartmentClick={(apt) => setActiveAptId(apt.id)}
               activeApartmentId={activeAptId}
+              apiKey={apiKey}
+              securityCode={securityCode}
             />
           </div>
 
@@ -360,7 +491,7 @@ export default function MapPage() {
                       <div className="flex items-center gap-2 text-[11px] text-muted-foreground mb-2">
                         <span>{apt.roomType}</span>
                         <span>·</span>
-                        <span>{apt.area}㎡</span>
+                        <span>{apt.area}</span>
                         <span>·</span>
                         <span>{apt.decoration}</span>
                       </div>

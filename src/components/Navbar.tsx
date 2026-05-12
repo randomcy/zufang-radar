@@ -23,12 +23,6 @@ export function Navbar() {
             人格测试
           </Link>
           <Link
-            href="/decide"
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            决策助手
-          </Link>
-          <Link
             href="/map"
             className="text-muted-foreground hover:text-foreground transition-colors"
           >
