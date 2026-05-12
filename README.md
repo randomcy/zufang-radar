@@ -44,6 +44,56 @@
 
 北京（年轻人租房痛点最集中的城市）
 
+## 如何启动
+
+```bash
+# 1. 安装依赖
+npm install
+
+# 2. 启动开发服务器（默认端口 3000）
+npm run dev
+
+# 访问 http://localhost:3000
+```
+
+### 其他常用命令
+
+```bash
+# 生产构建
+npm run build && npm start
+
+# 重新生成 mock 数据（apartments / communities / posts / conjoint-config）
+node scripts/generate-data.js
+```
+
+### 路由一览
+
+| 路径 | 说明 |
+| --- | --- |
+| `/` | 首页（Hero + 三大功能介绍） |
+| `/quiz` | 场景 A · 8 题人格测试 |
+| `/compare` | 场景 B · 决策助手 |
+| `/result?from=quiz` | 人格测试结果（雷达图 + 权重） |
+| `/result?from=compare` | 候选排序报告 |
+| `/map` | 通勤地图 + 房源列表 |
+| `/community/comm_001` | 三里屯 SOHO 体检报告（示例） |
+
+### 项目结构
+
+```
+zufang-radar/
+├── data/                 # mock JSON（apartments / communities / posts / conjoint-config）
+├── docs/                 # 设计文档
+├── public/mock/          # mock 图片占位
+├── scripts/              # 数据生成脚本
+└── src/
+    ├── app/              # Next.js App Router 页面
+    ├── components/       # 全局组件
+    ├── lib/              # conjoint / bradley-terry / utils
+    ├── store/            # zustand store
+    └── types/            # TypeScript 类型
+```
+
 ---
 
 *本项目为小红书面试 Demo，所有数据为虚构 mock，不代表真实房源信息。*

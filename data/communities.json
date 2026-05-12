@@ -1,0 +1,696 @@
+[
+  {
+    "id": "comm_001",
+    "name": "三里屯·朝阳门 SOHO 公寓",
+    "district": "朝阳区",
+    "area": "三里屯/朝阳门",
+    "coordinates": {
+      "lng": 116.434,
+      "lat": 39.924
+    },
+    "buildYear": 2010,
+    "buildingType": "塔楼",
+    "totalRating": 4.2,
+    "subscores": {
+      "noise": 3.2,
+      "soundproof": 3.8,
+      "property": 4.5,
+      "safety": 4.3,
+      "amenity": 4.9,
+      "valueForMoney": 3
+    },
+    "pros": [
+      {
+        "title": "周边配套绝了",
+        "summary": "楼下就是太古里和工体，餐厅咖啡馆密度全城 Top",
+        "evidenceCount": 23
+      },
+      {
+        "title": "10 号线 6 号线交汇",
+        "summary": "去哪都不用换乘，国贸 15 分钟，西单 20 分钟",
+        "evidenceCount": 18
+      },
+      {
+        "title": "物业是真爱粉",
+        "summary": "报修响应快，电梯维护好，半夜空调坏了 20 分钟有人到",
+        "evidenceCount": 12
+      }
+    ],
+    "cons": [
+      {
+        "title": "性价比一言难尽",
+        "summary": "同等面积比周边贵 20-30%，溢价全在地段",
+        "evidenceCount": 28
+      },
+      {
+        "title": "周末楼下吵到怀疑人生",
+        "summary": "太古里游客多，凌晨两点还有酒吧街声音",
+        "evidenceCount": 15
+      },
+      {
+        "title": "户型紧凑像鸽子笼",
+        "summary": "新盘开间普遍 30 平起，没有传统大户型",
+        "evidenceCount": 9
+      }
+    ],
+    "suitableFor": [
+      "年轻白领",
+      "社交达人",
+      "数字游民"
+    ],
+    "notSuitableFor": [
+      "居家办公需要安静",
+      "有小孩的家庭"
+    ],
+    "postIds": [
+      "post_001",
+      "post_002",
+      "post_003",
+      "post_004"
+    ]
+  },
+  {
+    "id": "comm_002",
+    "name": "望京·阿里西溪国际",
+    "district": "朝阳区",
+    "area": "望京",
+    "coordinates": {
+      "lng": 116.477,
+      "lat": 39.997
+    },
+    "buildYear": 2008,
+    "buildingType": "塔楼",
+    "totalRating": 4.4,
+    "subscores": {
+      "noise": 4,
+      "soundproof": 4,
+      "property": 4.4,
+      "safety": 4.6,
+      "amenity": 4.5,
+      "valueForMoney": 4
+    },
+    "pros": [
+      {
+        "title": "互联网人天堂",
+        "summary": "阿里、字节、美团都在 1 公里内，骑车 10 分钟到工位",
+        "evidenceCount": 31
+      },
+      {
+        "title": "韩餐烤肉吃到饱",
+        "summary": "望京小街韩国料理一条街，下班直接续摊",
+        "evidenceCount": 20
+      },
+      {
+        "title": "小区绿化超治愈",
+        "summary": "中央花园很大，晚上跑步遛狗的人很多",
+        "evidenceCount": 14
+      }
+    ],
+    "cons": [
+      {
+        "title": "早高峰地铁人贴人",
+        "summary": "15 号线望京站 8 点半挤到怀疑人生",
+        "evidenceCount": 22
+      },
+      {
+        "title": "停车位永远不够",
+        "summary": "晚上 9 点回来基本没位，得停到隔壁小区",
+        "evidenceCount": 13
+      },
+      {
+        "title": "餐饮单价偏贵",
+        "summary": "互联网公司多，餐厅人均比朝阳普通区贵 30%",
+        "evidenceCount": 10
+      }
+    ],
+    "suitableFor": [
+      "互联网打工人",
+      "夜猫子",
+      "韩餐爱好者"
+    ],
+    "notSuitableFor": [
+      "预算极低的实习生",
+      "讨厌人多的人"
+    ],
+    "postIds": [
+      "post_005",
+      "post_006",
+      "post_007",
+      "post_008"
+    ]
+  },
+  {
+    "id": "comm_003",
+    "name": "国贸·CBD 国际公寓",
+    "district": "朝阳区",
+    "area": "国贸/CBD",
+    "coordinates": {
+      "lng": 116.461,
+      "lat": 39.908
+    },
+    "buildYear": 2012,
+    "buildingType": "塔楼",
+    "totalRating": 4,
+    "subscores": {
+      "noise": 3,
+      "soundproof": 4.2,
+      "property": 4.7,
+      "safety": 4.7,
+      "amenity": 4.5,
+      "valueForMoney": 2.8
+    },
+    "pros": [
+      {
+        "title": "金融民工通勤神器",
+        "summary": "走 5 分钟到国贸三期，再也不用挤地铁",
+        "evidenceCount": 27
+      },
+      {
+        "title": "门禁安保堪比酒店",
+        "summary": "三道门禁 + 24 小时保安 + 监控全覆盖",
+        "evidenceCount": 17
+      },
+      {
+        "title": "高楼层景观炸裂",
+        "summary": "30 楼以上能看到 CBD 整片夜景，朋友来都不肯走",
+        "evidenceCount": 11
+      }
+    ],
+    "cons": [
+      {
+        "title": "贵到肉疼",
+        "summary": "一居室 12k 起步，社畜两个月工资就没了",
+        "evidenceCount": 35
+      },
+      {
+        "title": "周末空城感",
+        "summary": "周末楼下店铺很多不开，要找吃的得打车",
+        "evidenceCount": 14
+      },
+      {
+        "title": "电梯排队等不停",
+        "summary": "早晚高峰电梯能等 5 分钟以上，迟到不要紧吧",
+        "evidenceCount": 8
+      }
+    ],
+    "suitableFor": [
+      "金融民工",
+      "外企高管",
+      "短期出差党"
+    ],
+    "notSuitableFor": [
+      "预算有限的年轻人",
+      "需要烟火气的人"
+    ],
+    "postIds": [
+      "post_009",
+      "post_010",
+      "post_011"
+    ]
+  },
+  {
+    "id": "comm_004",
+    "name": "中关村·海淀黄庄学区房",
+    "district": "海淀区",
+    "area": "中关村/海淀黄庄",
+    "coordinates": {
+      "lng": 116.314,
+      "lat": 39.983
+    },
+    "buildYear": 1998,
+    "buildingType": "板楼",
+    "totalRating": 3.8,
+    "subscores": {
+      "noise": 3.5,
+      "soundproof": 3,
+      "property": 3.5,
+      "safety": 4.2,
+      "amenity": 4,
+      "valueForMoney": 3.8
+    },
+    "pros": [
+      {
+        "title": "理工科码农聚集地",
+        "summary": "字节、百度、新东方都在 2 公里内，骑车好到爆",
+        "evidenceCount": 24
+      },
+      {
+        "title": "教育资源拉满",
+        "summary": "周边人大附中、清华附小，连补课班都是顶配",
+        "evidenceCount": 19
+      },
+      {
+        "title": "美食低调但实在",
+        "summary": "海淀黄庄的西少爷、好伦哥、小串店，人均 30 吃饱",
+        "evidenceCount": 12
+      }
+    ],
+    "cons": [
+      {
+        "title": "楼龄真的老",
+        "summary": "90 年代的房子，水管老化，冬天暖气也有点凉",
+        "evidenceCount": 21
+      },
+      {
+        "title": "隔音是个谜",
+        "summary": "隔壁说话能听清，凌晨敲键盘都能传过来",
+        "evidenceCount": 18
+      },
+      {
+        "title": "停车场永远满",
+        "summary": "老小区车位紧张，外来车停车费 10 元/小时",
+        "evidenceCount": 9
+      }
+    ],
+    "suitableFor": [
+      "程序员",
+      "考研党",
+      "有学龄孩子家庭"
+    ],
+    "notSuitableFor": [
+      "注重装修和品质的人",
+      "不愿意忍受老楼的人"
+    ],
+    "postIds": [
+      "post_012",
+      "post_013",
+      "post_014",
+      "post_015"
+    ]
+  },
+  {
+    "id": "comm_005",
+    "name": "五道口·宇宙中心青年社区",
+    "district": "海淀区",
+    "area": "五道口",
+    "coordinates": {
+      "lng": 116.337,
+      "lat": 39.992
+    },
+    "buildYear": 2005,
+    "buildingType": "板楼",
+    "totalRating": 4.1,
+    "subscores": {
+      "noise": 3,
+      "soundproof": 3.5,
+      "property": 4,
+      "safety": 4.4,
+      "amenity": 4.6,
+      "valueForMoney": 4.2
+    },
+    "pros": [
+      {
+        "title": "夜生活永不打烊",
+        "summary": "清华北大旁边，凌晨 2 点烧烤店还在排队",
+        "evidenceCount": 26
+      },
+      {
+        "title": "韩餐韩货一条街",
+        "summary": "雪绒花、姜虎东、各种韩国超市，比首尔还方便",
+        "evidenceCount": 18
+      },
+      {
+        "title": "13 号线 + 15 号线",
+        "summary": "去望京 15 分钟，去回龙观也很快",
+        "evidenceCount": 14
+      }
+    ],
+    "cons": [
+      {
+        "title": "学生太多，吵到飞起",
+        "summary": "宿舍楼围着我，开学季楼下迎新喊话能持续一周",
+        "evidenceCount": 22
+      },
+      {
+        "title": "性价比开始下滑",
+        "summary": "这两年涨得厉害，单间已经到 4000+ 了",
+        "evidenceCount": 13
+      },
+      {
+        "title": "电梯坏的概率高",
+        "summary": "老楼电梯一年坏 3 次，爬 7 楼真的会哭",
+        "evidenceCount": 10
+      }
+    ],
+    "suitableFor": [
+      "留学生",
+      "学生党",
+      "互联网年轻人"
+    ],
+    "notSuitableFor": [
+      "注重安静的人",
+      "讨厌学生氛围的人"
+    ],
+    "postIds": [
+      "post_016",
+      "post_017",
+      "post_018",
+      "post_019"
+    ]
+  },
+  {
+    "id": "comm_006",
+    "name": "回龙观·龙泽苑东区",
+    "district": "昌平区",
+    "area": "回龙观",
+    "coordinates": {
+      "lng": 116.337,
+      "lat": 40.075
+    },
+    "buildYear": 2003,
+    "buildingType": "板楼",
+    "totalRating": 3.9,
+    "subscores": {
+      "noise": 4.2,
+      "soundproof": 3.8,
+      "property": 3.5,
+      "safety": 4,
+      "amenity": 3.8,
+      "valueForMoney": 4.7
+    },
+    "pros": [
+      {
+        "title": "便宜！便宜！便宜！",
+        "summary": "一居室 4000 出头，比朝阳便宜一半还多",
+        "evidenceCount": 33
+      },
+      {
+        "title": "码农刚需根据地",
+        "summary": "13 号线直达西二旗，互联网公司随便选",
+        "evidenceCount": 21
+      },
+      {
+        "title": "生活配套挺成熟",
+        "summary": "回龙观体育公园、龙域中心都在 1 公里内",
+        "evidenceCount": 15
+      }
+    ],
+    "cons": [
+      {
+        "title": "早高峰挤到怀疑人生",
+        "summary": "13 号线霍营到西二旗，每天像沙丁鱼罐头",
+        "evidenceCount": 30
+      },
+      {
+        "title": "回家就跟出差一样",
+        "summary": "市区聚会回来要 1.5 小时，社交基本断了",
+        "evidenceCount": 16
+      },
+      {
+        "title": "物业松散",
+        "summary": "楼道堆杂物没人管，电梯报修要催 3 遍",
+        "evidenceCount": 9
+      }
+    ],
+    "suitableFor": [
+      "西二旗码农",
+      "预算有限的年轻人",
+      "省钱攒钱党"
+    ],
+    "notSuitableFor": [
+      "需要市区夜生活",
+      "讨厌长通勤"
+    ],
+    "postIds": [
+      "post_020",
+      "post_021",
+      "post_022"
+    ]
+  },
+  {
+    "id": "comm_007",
+    "name": "通州·新华联家园",
+    "district": "通州区",
+    "area": "通州",
+    "coordinates": {
+      "lng": 116.658,
+      "lat": 39.909
+    },
+    "buildYear": 2014,
+    "buildingType": "塔楼",
+    "totalRating": 4,
+    "subscores": {
+      "noise": 4.3,
+      "soundproof": 4,
+      "property": 4.1,
+      "safety": 4.2,
+      "amenity": 3.8,
+      "valueForMoney": 4.5
+    },
+    "pros": [
+      {
+        "title": "副中心红利肉眼可见",
+        "summary": "环球影城开了之后周边升级超快，地铁 7 号线也通了",
+        "evidenceCount": 19
+      },
+      {
+        "title": "新房新装修舒服",
+        "summary": "10 年内的楼龄，户型方正，电梯不抢人",
+        "evidenceCount": 15
+      },
+      {
+        "title": "通州餐饮性价比高",
+        "summary": "万达广场什么都有，人均比朝阳低 30%",
+        "evidenceCount": 12
+      }
+    ],
+    "cons": [
+      {
+        "title": "进城真的远",
+        "summary": "去国贸一趟单程 50 分钟起，下班晚根本不想动",
+        "evidenceCount": 25
+      },
+      {
+        "title": "6 号线 7 号线高峰挤爆",
+        "summary": "果园站早上根本上不去，要等 3 班车",
+        "evidenceCount": 18
+      },
+      {
+        "title": "夜生活几乎为零",
+        "summary": "晚上 10 点之后街上没人，叫不到滴滴",
+        "evidenceCount": 11
+      }
+    ],
+    "suitableFor": [
+      "通州工作的人",
+      "预算中等的家庭",
+      "环球影城粉"
+    ],
+    "notSuitableFor": [
+      "在国贸/中关村上班的人",
+      "夜店咖"
+    ],
+    "postIds": [
+      "post_023",
+      "post_024",
+      "post_025"
+    ]
+  },
+  {
+    "id": "comm_008",
+    "name": "十里堡·泛海国际",
+    "district": "朝阳区",
+    "area": "十里堡",
+    "coordinates": {
+      "lng": 116.484,
+      "lat": 39.927
+    },
+    "buildYear": 2009,
+    "buildingType": "塔楼",
+    "totalRating": 4.3,
+    "subscores": {
+      "noise": 3.8,
+      "soundproof": 4.2,
+      "property": 4.6,
+      "safety": 4.5,
+      "amenity": 4.4,
+      "valueForMoney": 4.1
+    },
+    "pros": [
+      {
+        "title": "性价比之王",
+        "summary": "比三里屯便宜 30%，但去国贸就 10 分钟车程",
+        "evidenceCount": 22
+      },
+      {
+        "title": "6 号线一站到朝阳门",
+        "summary": "通勤朝阳门、东四的人非常省事",
+        "evidenceCount": 17
+      },
+      {
+        "title": "华堂商场是隐藏宝藏",
+        "summary": "全北京最完整的日式百货，地下日料超正宗",
+        "evidenceCount": 13
+      }
+    ],
+    "cons": [
+      {
+        "title": "周边夜生活偏少",
+        "summary": "晚上 10 点之后街上都打烊了，不如三里屯热闹",
+        "evidenceCount": 14
+      },
+      {
+        "title": "高峰时段电梯等很久",
+        "summary": "塔楼住户多，早 8 点电梯能等 5 分钟",
+        "evidenceCount": 9
+      },
+      {
+        "title": "户型偏小",
+        "summary": "一居室 45 平起，能用但不算宽敞",
+        "evidenceCount": 8
+      }
+    ],
+    "suitableFor": [
+      "朝阳门/国贸通勤",
+      "想要性价比的人",
+      "日料爱好者"
+    ],
+    "notSuitableFor": [
+      "需要丰富夜生活",
+      "追求大户型"
+    ],
+    "postIds": [
+      "post_026",
+      "post_027",
+      "post_028"
+    ]
+  },
+  {
+    "id": "comm_009",
+    "name": "双井·苹果社区",
+    "district": "朝阳区",
+    "area": "双井",
+    "coordinates": {
+      "lng": 116.464,
+      "lat": 39.895
+    },
+    "buildYear": 2007,
+    "buildingType": "塔楼",
+    "totalRating": 4.5,
+    "subscores": {
+      "noise": 4,
+      "soundproof": 4.3,
+      "property": 4.7,
+      "safety": 4.6,
+      "amenity": 4.7,
+      "valueForMoney": 4
+    },
+    "pros": [
+      {
+        "title": "颜值即正义",
+        "summary": "苹果社区设计感拉满，住进来像住在 ins 照片里",
+        "evidenceCount": 25
+      },
+      {
+        "title": "富力广场吃喝玩乐全包",
+        "summary": "下楼就是富力广场，电影、健身、商场一站搞定",
+        "evidenceCount": 18
+      },
+      {
+        "title": "物业是真懂租客",
+        "summary": "宠物友好，可以挂窗帘，不像有些小区一堆禁令",
+        "evidenceCount": 16
+      }
+    ],
+    "cons": [
+      {
+        "title": "10 号线高峰挤",
+        "summary": "双井站早上能等好几班车，肉墙肉海",
+        "evidenceCount": 20
+      },
+      {
+        "title": "网红打卡人多",
+        "summary": "周末楼下经常有人拍照，影响隐私",
+        "evidenceCount": 11
+      },
+      {
+        "title": "租金涨得快",
+        "summary": "去年到今年涨了 500-800，业主有点飘",
+        "evidenceCount": 12
+      }
+    ],
+    "suitableFor": [
+      "年轻夫妻",
+      "设计师",
+      "追求生活品质"
+    ],
+    "notSuitableFor": [
+      "预算紧张",
+      "讨厌人多"
+    ],
+    "postIds": [
+      "post_029",
+      "post_030",
+      "post_031"
+    ]
+  },
+  {
+    "id": "comm_010",
+    "name": "亚运村·安慧北里",
+    "district": "朝阳区",
+    "area": "亚运村",
+    "coordinates": {
+      "lng": 116.42,
+      "lat": 40
+    },
+    "buildYear": 1995,
+    "buildingType": "板楼",
+    "totalRating": 3.7,
+    "subscores": {
+      "noise": 4.2,
+      "soundproof": 3.2,
+      "property": 3.4,
+      "safety": 4,
+      "amenity": 4.1,
+      "valueForMoney": 4.4
+    },
+    "pros": [
+      {
+        "title": "老北京味道浓郁",
+        "summary": "楼下就是国家奥体中心，早上大爷大妈遛弯特别治愈",
+        "evidenceCount": 17
+      },
+      {
+        "title": "性价比不错",
+        "summary": "5 号线 + 8 号线，4500 能租一居室",
+        "evidenceCount": 14
+      },
+      {
+        "title": "公园比朝阳多",
+        "summary": "奥森公园 + 元大都遗址，周末跑步好去处",
+        "evidenceCount": 13
+      }
+    ],
+    "cons": [
+      {
+        "title": "老楼问题一堆",
+        "summary": "水压不稳定，厨房卫生间瓷砖老旧，住得有点凑合",
+        "evidenceCount": 19
+      },
+      {
+        "title": "隔音真的差",
+        "summary": "邻居半夜上厕所都能听见，敏感的人会崩溃",
+        "evidenceCount": 15
+      },
+      {
+        "title": "没电梯爬楼",
+        "summary": "6 层老板楼基本没电梯，搬家时哭出声",
+        "evidenceCount": 10
+      }
+    ],
+    "suitableFor": [
+      "预算中等想住北边",
+      "喜欢老北京氛围",
+      "锻炼狂人"
+    ],
+    "notSuitableFor": [
+      "怕老房子的人",
+      "对装修要求高"
+    ],
+    "postIds": [
+      "post_032",
+      "post_033",
+      "post_034"
+    ]
+  }
+]
