@@ -23,19 +23,13 @@ export function Navbar() {
             人格测试
           </Link>
           <Link
-            href="/compare"
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            决策助手
-          </Link>
-          <Link
             href="/map"
             className="text-muted-foreground hover:text-foreground transition-colors"
           >
             通勤地图
           </Link>
           <Link
-            href="/community/comm_001"
+            href="/community"
             className="text-muted-foreground hover:text-foreground transition-colors"
           >
             小区体检

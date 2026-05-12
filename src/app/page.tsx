@@ -8,7 +8,7 @@ import {
   ArrowRight,
   Compass,
   Brain,
-  HeartHandshake,
+  Search,
 } from "lucide-react";
 
 export default function HomePage() {
@@ -41,7 +41,7 @@ export default function HomePage() {
             <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto text-balance leading-relaxed">
               90% 的痛点不是"找不到房源"，而是
               <span className="text-foreground font-medium">不知道自己要什么</span>、
-              <span className="text-foreground font-medium">在候选里纠结</span>、
+              <span className="text-foreground font-medium">不知道通勤多久能忍</span>、
               <span className="text-foreground font-medium">看不到真实居住体验</span>。
               <br />
               <span className="text-muted-foreground/80 text-base">
@@ -58,9 +58,9 @@ export default function HomePage() {
                 </Link>
               </Button>
               <Button asChild variant="soft" size="lg" className="text-base">
-                <Link href="/compare">
-                  <HeartHandshake className="h-5 w-5" />
-                  我在几个候选里纠结
+                <Link href="/community">
+                  <Search className="h-5 w-5" />
+                  我先看看小区口碑
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>

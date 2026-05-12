@@ -1,35 +1,116 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Slider } from "@/components/ui/slider";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
 import {
-  MapPin,
-  Train,
-  Building2,
-  Clock,
   ChevronLeft,
-  Compass,
-  ArrowRight,
+  Building,
+  Train,
+  Clock,
+  MapPin,
+  Sparkles,
+  Heart,
+  Search,
+  X,
 } from "lucide-react";
+
+import stationsData from "../../../data/subway-stations.json";
+import companiesData from "../../../data/sample-companies.json";
 import apartmentsData from "../../../data/apartments.json";
+
+import {
+  stationsWithinCommuteTime,
+  apartmentsNearStations,
+  type SubwayStation,
+  type Company,
+} from "@/lib/commute";
+import { usePreferenceStore } from "@/store/preference";
 import type { Apartment } from "@/types";
 
-const apartments = apartmentsData as Apartment[];
+// 地图组件 SSR 不友好（依赖 window），用 dynamic 关掉 SSR
+const CommuteMap = dynamic(
+  () => import("@/components/map/CommuteMap").then((m) => m.CommuteMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full rounded-2xl bg-secondary border border-border flex items-center justify-center">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="h-4 w-4 rounded-full border-2 border-brand-red border-t-transparent animate-spin" />
+          地图加载中…
+        </div>
+      </div>
+    ),
+  }
+);
+
+const ALL_STATIONS = stationsData as SubwayStation[];
+const COMPANIES = companiesData as Company[];
+const ALL_APARTMENTS = apartmentsData as Apartment[];
 
 export default function MapPage() {
-  const [commuteMode, setCommuteMode] = useState("subway");
-  const [commuteTime, setCommuteTime] = useState([40]);
+  const [companyId, setCompanyId] = useState<string>("xiaohongshu");
+  const [maxMinutes, setMaxMinutes] = useState<number>(40);
+  const [budgetMax, setBudgetMax] = useState<number>(10000);
+  const [activeAptId, setActiveAptId] = useState<string | null>(null);
+  const [usePref, setUsePref] = useState<boolean>(true);
 
-  const displayed = apartments.slice(0, 6);
+  const pref = usePreferenceStore((s) => s.result);
+  const binaryPrefs = usePreferenceStore((s) => s.binaryPreferences);
+
+  const company = useMemo(
+    () => COMPANIES.find((c) => c.id === companyId)!,
+    [companyId]
+  );
+
+  // ===== 等时圈内的地铁站 =====
+  const stationsInRange = useMemo(
+    () => stationsWithinCommuteTime(ALL_STATIONS, company, maxMinutes),
+    [company, maxMinutes]
+  );
+
+  // ===== 等时圈附近的房源（基础筛选） =====
+  const aptsBase = useMemo(() => {
+    const near = apartmentsNearStations(
+      ALL_APARTMENTS,
+      stationsInRange,
+      1000
+    );
+    return near.filter((apt) => apt.price <= budgetMax);
+  }, [stationsInRange, budgetMax]);
+
+  // ===== 加入硬筛选偏好（独卫/养宠/阳台/电梯/近地铁）=====
+  const aptsAfterBinary = useMemo(() => {
+    if (!usePref || !binaryPrefs || Object.keys(binaryPrefs).length === 0) {
+      return aptsBase;
+    }
+    return aptsBase.filter((apt) => {
+      // 把 binaryPrefs 里值为 true 的标签都要求命中
+      for (const [key, val] of Object.entries(binaryPrefs)) {
+        if (!val) continue;
+        const tagMap: Record<string, string> = {
+          independent_bathroom: "独卫",
+          pet_friendly: "可养宠",
+          balcony: "有阳台",
+          elevator: "有电梯",
+          near_subway: "近地铁",
+        };
+        const tag = tagMap[key];
+        if (tag && !apt.tags.includes(tag)) return false;
+      }
+      return true;
+    });
+  }, [aptsBase, binaryPrefs, usePref]);
+
+  const filteredApts = aptsAfterBinary;
 
   return (
-    <div className="container py-10 md:py-14 max-w-7xl">
+    <div className="container py-8 md:py-10 max-w-7xl">
       <Link
         href="/"
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors"
@@ -38,181 +119,279 @@ export default function MapPage() {
         返回首页
       </Link>
 
-      <div className="mb-8">
-        <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-sky-700 mb-2">
-          <Compass className="h-3.5 w-3.5" />
-          功能二 · 通勤地图筛选
+      {/* ===== 头部 ===== */}
+      <div className="mb-6">
+        <div className="text-xs text-sky-700 font-semibold uppercase tracking-widest mb-2">
+          功能二 · 通勤地图
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-          告诉我你公司在哪
+        <h1 className="text-3xl md:text-4xl font-bold mb-2">
+          先有"通勤可接受"，再有"房源选择"
         </h1>
-        <p className="mt-2 text-muted-foreground">
-          反向找出能在期望通勤时间内到达的地铁站和周边房源。
+        <p className="text-muted-foreground">
+          输入公司位置和能忍受的通勤时间，AI 反推符合的地铁站，并叠加预算和偏好筛选。
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-[320px_1fr] gap-6">
-        {/* 左侧筛选面板 */}
-        <aside className="space-y-5">
-          <Card className="p-5">
-            <h2 className="text-sm font-bold mb-4 flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-brand-red" />
-              公司位置
-            </h2>
-            <Input placeholder="输入公司地址或地铁站" defaultValue="国贸·CBD" />
-            <p className="text-xs text-muted-foreground mt-2">
-              已识别：国贸地铁站（1 号线 / 10 号线）
-            </p>
+      <div className="grid lg:grid-cols-[360px_1fr] gap-5">
+        {/* ===== 左侧控制面板 ===== */}
+        <div className="space-y-4">
+          {/* 1) 公司选择 */}
+          <Card className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Building className="h-4 w-4 text-sky-700" />
+              <h3 className="font-semibold text-sm">第 1 步 · 你的公司在哪</h3>
+            </div>
+            <div className="grid gap-1.5">
+              {COMPANIES.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => setCompanyId(c.id)}
+                  className={`text-left px-3 py-2 rounded-lg border text-sm transition-all ${
+                    companyId === c.id
+                      ? "bg-sky-50 border-sky-300 text-sky-900"
+                      : "bg-white border-border hover:border-sky-200 hover:bg-sky-50/40"
+                  }`}
+                >
+                  <div className="font-medium truncate">{c.name}</div>
+                  <div className="text-[10px] text-muted-foreground truncate">
+                    {c.address}
+                  </div>
+                </button>
+              ))}
+            </div>
           </Card>
 
-          <Card className="p-5">
-            <h2 className="text-sm font-bold mb-4 flex items-center gap-2">
-              <Clock className="h-4 w-4 text-brand-red" />
-              期望通勤时间
-            </h2>
-            <div className="flex items-baseline gap-2 mb-3">
-              <span className="text-3xl font-bold text-brand-red-deep tabular-nums">
-                {commuteTime[0]}
+          {/* 2) 通勤时间 */}
+          <Card className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Clock className="h-4 w-4 text-sky-700" />
+              <h3 className="font-semibold text-sm">
+                第 2 步 · 你能忍受的通勤
+              </h3>
+            </div>
+            <div className="mb-2 flex items-baseline justify-between">
+              <span className="text-xs text-muted-foreground">每天单程</span>
+              <span className="text-2xl font-bold text-sky-700 tabular-nums">
+                ≤ {maxMinutes}
+                <span className="text-sm text-muted-foreground font-normal ml-1">
+                  分钟
+                </span>
               </span>
-              <span className="text-sm text-muted-foreground">分钟以内</span>
             </div>
             <Slider
-              value={commuteTime}
-              onValueChange={setCommuteTime}
-              min={10}
-              max={90}
+              value={[maxMinutes]}
+              min={20}
+              max={75}
               step={5}
+              onValueChange={(v) => setMaxMinutes(v[0])}
             />
-            <div className="flex justify-between text-xs text-muted-foreground mt-2">
-              <span>10 min</span>
-              <span>90 min</span>
+            <div className="flex justify-between text-[10px] text-muted-foreground mt-1.5">
+              <span>20 分钟</span>
+              <span>75 分钟</span>
             </div>
           </Card>
 
-          <Card className="p-5">
-            <h2 className="text-sm font-bold mb-4 flex items-center gap-2">
-              <Train className="h-4 w-4 text-brand-red" />
-              通勤方式
-            </h2>
-            <RadioGroup
-              value={commuteMode}
-              onValueChange={setCommuteMode}
-              className="space-y-2"
-            >
-              {[
-                { id: "subway", label: "地铁" },
-                { id: "bus", label: "公交 + 地铁" },
-                { id: "bike", label: "自行车 / 电动车" },
-                { id: "car", label: "开车" },
-              ].map((m) => (
-                <label
-                  key={m.id}
-                  htmlFor={m.id}
-                  className="flex items-center gap-3 rounded-xl p-2 cursor-pointer hover:bg-secondary transition-colors"
-                >
-                  <RadioGroupItem value={m.id} id={m.id} />
-                  <span className="text-sm">{m.label}</span>
-                </label>
-              ))}
-            </RadioGroup>
+          {/* 3) 预算 */}
+          <Card className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="h-4 w-4 text-sky-700" />
+              <h3 className="font-semibold text-sm">第 3 步 · 月租预算上限</h3>
+            </div>
+            <div className="mb-2 flex items-baseline justify-between">
+              <span className="text-xs text-muted-foreground">每月</span>
+              <span className="text-2xl font-bold text-sky-700 tabular-nums">
+                ¥{(budgetMax / 1000).toFixed(1)}k
+              </span>
+            </div>
+            <Slider
+              value={[budgetMax]}
+              min={3000}
+              max={20000}
+              step={500}
+              onValueChange={(v) => setBudgetMax(v[0])}
+            />
+            <div className="flex justify-between text-[10px] text-muted-foreground mt-1.5">
+              <span>¥3k</span>
+              <span>¥20k</span>
+            </div>
           </Card>
 
-          <Button className="w-full" size="lg">
-            <ArrowRight className="h-4 w-4" />
-            应用筛选
-          </Button>
-        </aside>
-
-        {/* 右侧地图区 + 列表 */}
-        <div className="space-y-6">
-          <Card className="relative overflow-hidden h-[420px] bg-gradient-to-br from-slate-50 to-slate-100 border-dashed">
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-background shadow-soft mb-4">
-                <MapPin className="h-8 w-8 text-brand-red" />
+          {/* 4) 偏好画像（如果有的话） */}
+          {pref && Object.values(binaryPrefs || {}).some(Boolean) && (
+            <Card className="p-4 border-brand-red/20 bg-brand-red-pale/10">
+              <div className="flex items-start gap-3 mb-3">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-red/10 text-brand-red shrink-0">
+                  <Heart className="h-4 w-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm">叠加你的硬筛选偏好</h3>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    来自人格测试 · 「{pref.personalityTag}」
+                  </p>
+                </div>
+                <button
+                  onClick={() => setUsePref((v) => !v)}
+                  className={`shrink-0 inline-flex items-center h-5 w-9 rounded-full transition-colors ${
+                    usePref ? "bg-brand-red" : "bg-secondary"
+                  }`}
+                  aria-label="开关"
+                >
+                  <span
+                    className={`block h-4 w-4 bg-white rounded-full transition-transform shadow ${
+                      usePref ? "translate-x-4" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
               </div>
-              <h3 className="text-lg font-bold mb-2">地图加载区</h3>
-              <p className="text-sm text-muted-foreground max-w-sm">
-                Phase 1 接入高德地图 JS API，叠加等时圈、地铁线网和房源 marker。
-                此处目前为占位组件。
+              <div className="flex flex-wrap gap-1.5">
+                {Object.entries(binaryPrefs)
+                  .filter(([, v]) => v)
+                  .map(([k]) => {
+                    const labels: Record<string, string> = {
+                      independent_bathroom: "独卫",
+                      pet_friendly: "可养宠",
+                      balcony: "阳台",
+                      elevator: "电梯",
+                      near_subway: "近地铁",
+                    };
+                    return (
+                      <Badge
+                        key={k}
+                        variant={usePref ? "default" : "outline"}
+                        className="text-[10px]"
+                      >
+                        {labels[k] ?? k}
+                      </Badge>
+                    );
+                  })}
+              </div>
+            </Card>
+          )}
+
+          {!pref && (
+            <Card className="p-4 bg-gradient-to-br from-brand-red-pale/30 to-rose-50 border-brand-red/10">
+              <h3 className="font-semibold text-sm mb-1">
+                还没做过人格测试？
+              </h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                做完后可以把"必须有独卫/阳台"这些硬条件叠加到地图筛选。
               </p>
-              <div className="mt-6 flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="flex h-2 w-2 rounded-full bg-brand-red" />
-                你的公司
-                <span className="text-border ml-3">·</span>
-                <span className="flex h-2 w-2 rounded-full bg-sky-500 ml-3" />
-                {commuteTime[0]} 分钟可达
-                <span className="text-border ml-3">·</span>
-                <span className="flex h-2 w-2 rounded-full bg-emerald-500 ml-3" />
-                推荐房源
+              <Button asChild size="sm" variant="outline" className="w-full">
+                <Link href="/quiz">2 分钟做一次测试</Link>
+              </Button>
+            </Card>
+          )}
+
+          {/* 5) 结果汇总 */}
+          <Card className="p-4 bg-secondary/30">
+            <div className="text-xs text-muted-foreground mb-1">筛选结果</div>
+            <div className="space-y-1.5 text-sm">
+              <div className="flex justify-between">
+                <span>等时圈内地铁站</span>
+                <span className="font-mono font-semibold tabular-nums">
+                  {stationsInRange.length} 个
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>符合条件的房源</span>
+                <span className="font-mono font-semibold tabular-nums text-brand-red-deep">
+                  {filteredApts.length} 套
+                </span>
               </div>
             </div>
-            {/* 装饰背景网格 */}
-            <div
-              className="absolute inset-0 opacity-30 pointer-events-none"
-              style={{
-                backgroundImage:
-                  "linear-gradient(to right, #cbd5e1 1px, transparent 1px), linear-gradient(to bottom, #cbd5e1 1px, transparent 1px)",
-                backgroundSize: "40px 40px",
-              }}
-            />
           </Card>
+        </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold">
-                推荐房源
-                <span className="text-sm font-normal text-muted-foreground ml-2">
-                  · 共 {displayed.length} 套（演示）
-                </span>
-              </h2>
-              <Button variant="ghost" size="sm">
-                查看全部
-              </Button>
-            </div>
-
-            <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
-              {displayed.map((apt) => (
-                <Card
-                  key={apt.id}
-                  className="overflow-hidden hover:shadow-card-hover transition-all duration-200"
-                >
-                  <div className="h-32 bg-gradient-to-br from-brand-red-pale to-rose-100 flex items-center justify-center">
-                    <Building2 className="h-8 w-8 text-brand-red-deep/50" />
-                  </div>
-                  <div className="p-4">
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <h3 className="text-sm font-bold leading-snug line-clamp-2">
-                        {apt.title}
-                      </h3>
-                      <div className="text-right shrink-0">
-                        <div className="text-base font-bold text-brand-red-deep tabular-nums">
-                          ¥{apt.price.toLocaleString()}
-                        </div>
-                        <div className="text-[10px] text-muted-foreground">/月</div>
-                      </div>
-                    </div>
-                    <div className="text-xs text-muted-foreground mb-3">
-                      {apt.roomType} · {apt.area}㎡ · {apt.floor} · {apt.decoration}
-                    </div>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3">
-                      <Train className="h-3 w-3" />
-                      <span>{apt.subwayStation}</span>
-                      <span className="text-border">·</span>
-                      <Clock className="h-3 w-3" />
-                      <span>通勤 {apt.commuteToSampleCompany} 分钟</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {apt.tags.slice(0, 3).map((t) => (
-                        <Badge key={t} variant="soft" className="text-[10px]">
-                          {t}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
+        {/* ===== 右侧地图 + 房源列表 ===== */}
+        <div className="space-y-4">
+          {/* 地图 */}
+          <div className="h-[440px] md:h-[520px]">
+            <CommuteMap
+              company={company}
+              stationsInRange={stationsInRange}
+              allStations={ALL_STATIONS}
+              apartments={filteredApts}
+              maxMinutes={maxMinutes}
+              onApartmentClick={(apt) => setActiveAptId(apt.id)}
+              activeApartmentId={activeAptId}
+            />
           </div>
+
+          {/* 房源列表 */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-base font-bold">符合的房源</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  按"地铁通勤总时长"从短到长排序
+                </p>
+              </div>
+              <Badge variant="soft">{filteredApts.length} 套</Badge>
+            </div>
+
+            {filteredApts.length === 0 ? (
+              <div className="text-center py-10 text-sm text-muted-foreground bg-secondary/30 rounded-xl">
+                <Search className="h-6 w-6 mx-auto mb-2 text-muted-foreground/60" />
+                没有匹配的房源，试试放宽通勤时间或预算
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 gap-3">
+                {filteredApts.slice(0, 8).map((apt) => {
+                  const active = activeAptId === apt.id;
+                  return (
+                    <button
+                      key={apt.id}
+                      onClick={() => setActiveAptId(apt.id)}
+                      className={`text-left p-3 rounded-xl border transition-all ${
+                        active
+                          ? "border-brand-red bg-brand-red-pale/30 shadow-sm"
+                          : "border-border bg-white hover:border-brand-red/40 hover:bg-brand-red-pale/10"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2 mb-1.5">
+                        <h3 className="font-semibold text-sm leading-snug line-clamp-1 flex-1">
+                          {apt.title}
+                        </h3>
+                        <span className="text-sm font-bold text-brand-red-deep tabular-nums shrink-0">
+                          ¥{(apt.price / 1000).toFixed(1)}k
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] text-muted-foreground mb-2">
+                        <span>{apt.roomType}</span>
+                        <span>·</span>
+                        <span>{apt.area}㎡</span>
+                        <span>·</span>
+                        <span>{apt.decoration}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[11px]">
+                        <Train className="h-3 w-3 text-sky-600" />
+                        <span className="text-sky-700 font-medium">
+                          {apt.nearestStation.name}
+                        </span>
+                        <span className="text-muted-foreground">
+                          · 步行 {Math.round(apt.distanceToStation / 80)} 分钟
+                          · 通勤约{" "}
+                          <span className="font-semibold text-foreground">
+                            {Math.round(
+                              apt.nearestStation.commuteMinutes +
+                                apt.distanceToStation / 80
+                            )}
+                          </span>{" "}
+                          分钟
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {filteredApts.length > 8 && (
+              <div className="text-center mt-3 text-xs text-muted-foreground">
+                还有 {filteredApts.length - 8} 套，地图上可点击查看
+              </div>
+            )}
+          </Card>
         </div>
       </div>
     </div>

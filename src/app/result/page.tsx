@@ -144,7 +144,12 @@ function QuizResult() {
 
   if (!mounted) {
     return (
-      <div className="py-20 text-center text-muted-foreground">加载中...</div>
+      <div className="py-20 flex items-center justify-center text-sm text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <div className="h-4 w-4 rounded-full border-2 border-brand-red border-t-transparent animate-spin" />
+          加载中…
+        </div>
+      </div>
     );
   }
 

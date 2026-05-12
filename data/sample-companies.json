@@ -1,0 +1,9 @@
+[
+  { "id": "xiaohongshu", "name": "小红书 · 上海中心办公区(北京分部)", "lng": 116.4570, "lat": 39.9255, "address": "朝阳区三里屯太古里附近", "industry": "互联网" },
+  { "id": "bytedance", "name": "字节跳动 · 望京总部", "lng": 116.4710, "lat": 40.0030, "address": "朝阳区望京阜通东大街", "industry": "互联网" },
+  { "id": "tencent", "name": "腾讯 · 北京总部(中关村)", "lng": 116.3180, "lat": 39.9830, "address": "海淀区中关村", "industry": "互联网" },
+  { "id": "baidu", "name": "百度 · 西二旗总部", "lng": 116.3050, "lat": 40.0510, "address": "海淀区西二旗", "industry": "互联网" },
+  { "id": "alibaba", "name": "阿里 · 望京西溪", "lng": 116.4770, "lat": 39.9970, "address": "朝阳区望京", "industry": "互联网" },
+  { "id": "guomao_cbd", "name": "国贸 CBD · 综合金融区", "lng": 116.4602, "lat": 39.9085, "address": "朝阳区国贸建国门外大街", "industry": "金融/咨询" },
+  { "id": "jinrongjie", "name": "金融街 · 央企金融区", "lng": 116.3590, "lat": 39.9120, "address": "西城区金融街", "industry": "金融" }
+]
