@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { Input } from "@/components/ui/input";
 import {
   ChevronLeft,
   Building,
@@ -17,11 +16,9 @@ import {
   Heart,
   Search,
   AlertTriangle,
-  Settings,
-  Key,
-  ExternalLink,
   MapPin,
 } from "lucide-react";
+import { AMAP_KEY, AMAP_SECURITY_CODE } from "@/lib/amap-config";
 
 import stationsData from "../../../data/subway-stations.json";
 import apartmentsData from "../../../data/apartments.json";
@@ -71,9 +68,6 @@ const DEFAULT_COMPANY: Company = {
 };
 
 export default function MapPage() {
-  const [apiKey, setApiKey] = useState<string>("");
-  const [securityCode, setSecurityCode] = useState<string>("");
-  const [showKeyPanel, setShowKeyPanel] = useState<boolean>(false);
   const [company, setCompany] = useState<Company>(DEFAULT_COMPANY);
 
   const [maxMinutes, setMaxMinutes] = useState<number>(40);
@@ -83,30 +77,6 @@ export default function MapPage() {
 
   const pref = usePreferenceStore((s) => s.result);
   const binaryPrefs = usePreferenceStore((s) => s.binaryPreferences);
-
-  // ===== 从 localStorage 恢复 key =====
-  useEffect(() => {
-    const savedKey = localStorage.getItem("amap_jsapi_key") || "";
-    const savedSec = localStorage.getItem("amap_security_code") || "";
-    if (savedKey) setApiKey(savedKey);
-    if (savedSec) setSecurityCode(savedSec);
-    // 没填的话默认把 key 输入面板展开
-    if (!savedKey) setShowKeyPanel(true);
-  }, []);
-
-  // ===== 保存 key 到 localStorage =====
-  const handleSaveKey = () => {
-    localStorage.setItem("amap_jsapi_key", apiKey);
-    localStorage.setItem("amap_security_code", securityCode);
-    setShowKeyPanel(false);
-  };
-
-  const handleClearKey = () => {
-    localStorage.removeItem("amap_jsapi_key");
-    localStorage.removeItem("amap_security_code");
-    setApiKey("");
-    setSecurityCode("");
-  };
 
   // ===== 等时圈内的地铁站 =====
   const stationsInRange = useMemo(
@@ -144,8 +114,6 @@ export default function MapPage() {
 
   const filteredApts = aptsAfterBinary;
 
-  const hasKey = apiKey.length > 0;
-
   return (
     <div className="container py-8 md:py-10 max-w-7xl">
       <Link
@@ -171,127 +139,34 @@ export default function MapPage() {
       <div className="grid lg:grid-cols-[360px_1fr] gap-5">
         {/* ===== 左侧控制面板 ===== */}
         <div className="space-y-4">
-          {/* 0) 高德 key 配置 */}
-          <Card
-            className={`p-4 ${
-              hasKey
-                ? "bg-emerald-50/30 border-emerald-200/60"
-                : "bg-amber-50/40 border-amber-200/60"
-            }`}
-          >
-            <button
-              onClick={() => setShowKeyPanel((v) => !v)}
-              className="w-full flex items-center justify-between text-left"
-            >
-              <div className="flex items-center gap-2">
-                <Key
-                  className={`h-4 w-4 ${
-                    hasKey ? "text-emerald-700" : "text-amber-700"
-                  }`}
-                />
-                <h3 className="font-semibold text-sm">
-                  {hasKey ? "已配置高德地图" : "请先配置高德地图 key"}
-                </h3>
-              </div>
-              <Settings className="h-3.5 w-3.5 text-muted-foreground" />
-            </button>
-
-            {showKeyPanel && (
-              <div className="mt-3 space-y-2.5">
-                <div>
-                  <label className="text-[11px] text-muted-foreground block mb-1">
-                    JSAPI Key
-                  </label>
-                  <Input
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value.trim())}
-                    placeholder="32 位字符"
-                    className="text-xs font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] text-muted-foreground block mb-1">
-                    安全密钥（JS Code）
-                  </label>
-                  <Input
-                    value={securityCode}
-                    onChange={(e) => setSecurityCode(e.target.value.trim())}
-                    placeholder="32 位字符"
-                    className="text-xs font-mono"
-                  />
-                </div>
-                <div className="flex gap-2 pt-1">
-                  <Button
-                    size="sm"
-                    className="flex-1"
-                    onClick={handleSaveKey}
-                    disabled={!apiKey}
-                  >
-                    保存到本地
-                  </Button>
-                  {hasKey && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={handleClearKey}
-                    >
-                      清除
-                    </Button>
-                  )}
-                </div>
-                <a
-                  href="https://console.amap.com/dev/key/app"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-1 text-[11px] text-sky-700 hover:underline pt-1"
-                >
-                  没有 key？去高德开放平台免费申请
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-                <p className="text-[10px] text-muted-foreground leading-relaxed">
-                  类型选「Web 端 (JS API)」，免费版每日 5000 次足够日常使用。key
-                  仅保存在你浏览器本地，不上传服务器。
-                </p>
-              </div>
-            )}
-          </Card>
-
           {/* 1) 搜公司 */}
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-3">
               <Building className="h-4 w-4 text-sky-700" />
               <h3 className="font-semibold text-sm">第 1 步 · 搜你的公司位置</h3>
             </div>
-            {hasKey ? (
-              <>
-                <PlaceSearch
-                  apiKey={apiKey}
-                  securityCode={securityCode}
-                  onPick={(p) =>
-                    setCompany({
-                      id: p.id,
-                      name: p.name,
-                      lng: p.location.lng,
-                      lat: p.location.lat,
-                    })
-                  }
-                  placeholder="搜小红书 / 字节跳动 / 你家小区…"
-                />
-                <div className="mt-2.5 flex items-start gap-2 text-[11px] text-muted-foreground bg-secondary/40 rounded-lg p-2">
-                  <MapPin className="h-3 w-3 mt-0.5 text-sky-600 shrink-0" />
-                  <div className="leading-relaxed">
-                    当前地点：
-                    <span className="font-medium text-foreground">
-                      {company.name}
-                    </span>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="text-xs text-muted-foreground bg-secondary/40 rounded-lg p-3 leading-relaxed">
-                配置 key 后即可在此搜索<span className="font-medium">你公司、学校或任何北京真实地点</span>，AI 围绕这个点画通勤等时圈。
+            <PlaceSearch
+              apiKey={AMAP_KEY}
+              securityCode={AMAP_SECURITY_CODE}
+              onPick={(p) =>
+                setCompany({
+                  id: p.id,
+                  name: p.name,
+                  lng: p.location.lng,
+                  lat: p.location.lat,
+                })
+              }
+              placeholder="搜小红书 / 字节跳动 / 你家小区…"
+            />
+            <div className="mt-2.5 flex items-start gap-2 text-[11px] text-muted-foreground bg-secondary/40 rounded-lg p-2">
+              <MapPin className="h-3 w-3 mt-0.5 text-sky-600 shrink-0" />
+              <div className="leading-relaxed">
+                当前地点：
+                <span className="font-medium text-foreground">
+                  {company.name}
+                </span>
               </div>
-            )}
+            </div>
           </Card>
 
           {/* 2) 通勤时间 */}
@@ -444,8 +319,8 @@ export default function MapPage() {
               maxMinutes={maxMinutes}
               onApartmentClick={(apt) => setActiveAptId(apt.id)}
               activeApartmentId={activeAptId}
-              apiKey={apiKey}
-              securityCode={securityCode}
+              apiKey={AMAP_KEY}
+              securityCode={AMAP_SECURITY_CODE}
             />
           </div>
 
