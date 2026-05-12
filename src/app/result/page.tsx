@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -21,26 +21,39 @@ import {
   Trophy,
   Crown,
   Medal,
+  RotateCcw,
 } from "lucide-react";
+import { usePreferenceStore } from "@/store/preference";
+import conjointConfig from "../../../data/conjoint-config.json";
+import type { ConjointConfig, PreferenceResult } from "@/types";
 
-const MOCK_RADAR_DATA = [
-  { axis: "通勤", value: 92, fullMark: 100 },
-  { axis: "价格", value: 76, fullMark: 100 },
-  { axis: "房型", value: 68, fullMark: 100 },
-  { axis: "装修", value: 55, fullMark: 100 },
-  { axis: "小区品质", value: 48, fullMark: 100 },
-  { axis: "楼栋类型", value: 32, fullMark: 100 },
+// ============================================================
+// 工具：把 PreferenceResult 转为雷达图数据
+// ============================================================
+function buildRadarData(result: PreferenceResult) {
+  // 雷达图用 0-100 的相对值（最大权重映射到 100）
+  const max = Math.max(...result.weights.map((w) => w.weight), 0.001);
+  return result.weights.map((w) => ({
+    axis: w.name,
+    value: Math.round((w.weight / max) * 100),
+    actualWeight: Math.round(w.weight * 100),
+    fullMark: 100,
+  }));
+}
+
+// 权重条颜色映射
+const BAR_COLORS = [
+  "bg-brand-red",
+  "bg-rose-400",
+  "bg-amber-400",
+  "bg-emerald-400",
+  "bg-sky-400",
+  "bg-violet-400",
 ];
 
-const MOCK_WEIGHTS = [
-  { name: "通勤时间", icon: "🚇", weight: 0.32, color: "bg-brand-red" },
-  { name: "月租价格", icon: "💰", weight: 0.24, color: "bg-rose-400" },
-  { name: "房型", icon: "🏠", weight: 0.18, color: "bg-amber-400" },
-  { name: "装修档次", icon: "✨", weight: 0.13, color: "bg-emerald-400" },
-  { name: "小区品质", icon: "🏢", weight: 0.09, color: "bg-sky-400" },
-  { name: "楼栋类型", icon: "🏗️", weight: 0.04, color: "bg-violet-400" },
-];
-
+// ============================================================
+// CompareResult 还是 mock（Phase 2 实现）
+// ============================================================
 const MOCK_COMPARE_RANK = [
   {
     rank: 1,
@@ -118,32 +131,96 @@ function ResultInner() {
   );
 }
 
+// ============================================================
+// 场景 A 结果展示（真实数据）
+// ============================================================
 function QuizResult() {
+  const { result, binaryPreferences } = usePreferenceStore();
+  const config = conjointConfig as ConjointConfig;
+
+  // 避免 SSR/CSR 不一致 → 只在客户端 mount 后渲染
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) {
+    return (
+      <div className="py-20 text-center text-muted-foreground">加载中...</div>
+    );
+  }
+
+  // 没有结果（直接打开 /result）→ 引导回去做测试
+  if (!result) {
+    return (
+      <div className="py-20 text-center">
+        <h2 className="text-2xl font-bold mb-3">还没有偏好画像</h2>
+        <p className="text-muted-foreground mb-6">
+          完成 8 道偏好题，我们就能告诉你最在乎什么
+        </p>
+        <Button asChild size="lg">
+          <Link href="/quiz">开始人格测试</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  const radarData = buildRadarData(result);
+  const sortedWeights = result.sortedWeights;
+  const maxWeight = sortedWeights[0]?.weight ?? 0.001;
+  const top1 = sortedWeights[0];
+  const top2 = sortedWeights[1];
+  const bottom1 = sortedWeights[sortedWeights.length - 1];
+
+  // binary preferences 的标签
+  const filterLabels = config.binaryFilters
+    .filter((f) => binaryPreferences[f.id])
+    .map((f) => `${f.icon} ${f.label}`);
+
   return (
     <div>
       <div className="mb-10">
         <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-brand-red-deep mb-2">
           <Sparkles className="h-3.5 w-3.5" />
-          你的偏好画像（场景 A · 8 题完成）
+          你的偏好画像（场景 A · 10 题完成）
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-          你是一个
+        <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-3 leading-tight">
+          选房时你最看重
           <span className="bg-gradient-to-r from-brand-red to-rose-500 bg-clip-text text-transparent">
-            {" "}
-            通勤优先型
-            {" "}
+            {" "}{top1?.icon}{top1?.name}{" "}
           </span>
-          租客
+          和
+          <span className="bg-gradient-to-r from-rose-500 to-amber-500 bg-clip-text text-transparent">
+            {" "}{top2?.icon}{top2?.name}{" "}
+          </span>
         </h1>
-        <p className="text-muted-foreground max-w-2xl">
-          基于你在 8 道题里的选择，我们用 Conjoint Analysis 计算了你在 6 个维度上的相对权重。
-          你最看重通勤效率，其次才是价格，对硬件本身相对宽容。
+        <p className="text-muted-foreground max-w-2xl mt-3">
+          愿意为它们在「{bottom1?.icon} {bottom1?.name}」上做出妥协。
+          <span className="block mt-2 text-sm">
+            这是基于你 10 道题选择的 Conjoint Analysis 结果。{result.description}
+          </span>
         </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Badge variant="soft">#通勤优先型</Badge>
-          <Badge variant="outline">#不愿意为颜值溢价</Badge>
-          <Badge variant="outline">#可接受小户型</Badge>
+        <div className="mt-4 flex flex-wrap gap-2 items-center">
+          <span className="text-xs text-muted-foreground">租房人格：</span>
+          <Badge variant="soft">#{result.personalityTag}</Badge>
+          {result.subTags.map((tag) => (
+            <Badge key={tag} variant="outline">#{tag}</Badge>
+          ))}
         </div>
+
+        {/* 硬筛选条件 */}
+        {filterLabels.length > 0 && (
+          <div className="mt-4 flex items-start gap-2 flex-wrap">
+            <span className="text-xs text-muted-foreground shrink-0 mt-1">
+              另外你要求：
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {filterLabels.map((label) => (
+                <Badge key={label} variant="outline" className="text-xs">
+                  {label}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
@@ -151,11 +228,11 @@ function QuizResult() {
         <Card className="p-6">
           <h2 className="text-lg font-bold mb-1">偏好雷达图</h2>
           <p className="text-xs text-muted-foreground mb-4">
-            数值越高，说明你越看重这个维度（0-100）
+            数值越高，说明你越看重这个维度（最大值映射到 100）
           </p>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <RadarChart data={MOCK_RADAR_DATA}>
+              <RadarChart data={radarData}>
                 <PolarGrid stroke="hsl(var(--border))" />
                 <PolarAngleAxis
                   dataKey="axis"
@@ -183,11 +260,11 @@ function QuizResult() {
         <Card className="p-6">
           <h2 className="text-lg font-bold mb-1">维度权重排序</h2>
           <p className="text-xs text-muted-foreground mb-4">
-            这是你选房时各维度的相对重要性
+            这是你选房时各维度的相对重要性（合计 100%）
           </p>
           <div className="space-y-4 mt-6">
-            {MOCK_WEIGHTS.map((w, i) => (
-              <div key={w.name}>
+            {sortedWeights.map((w, i) => (
+              <div key={w.attributeId}>
                 <div className="flex items-center justify-between text-sm mb-1.5">
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground tabular-nums w-4">
@@ -202,8 +279,10 @@ function QuizResult() {
                 </div>
                 <div className="h-2 rounded-full bg-secondary overflow-hidden">
                   <div
-                    className={`h-full ${w.color} rounded-full transition-all duration-700`}
-                    style={{ width: `${w.weight * 100 / 0.32 * 100}%` }}
+                    className={`h-full ${BAR_COLORS[i] ?? "bg-gray-300"} rounded-full transition-all duration-700`}
+                    style={{
+                      width: `${(w.weight / maxWeight) * 100}%`,
+                    }}
                   />
                 </div>
               </div>
@@ -214,20 +293,43 @@ function QuizResult() {
 
       {/* 解读卡片 */}
       <Card className="mt-6 p-6 bg-brand-red-pale/40 border-brand-red/10">
-        <h3 className="font-bold mb-2 flex items-center gap-2">
+        <h3 className="font-bold mb-3 flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-brand-red-deep" />
           我们的解读
         </h3>
-        <p className="text-sm text-foreground/80 leading-relaxed">
-          作为<strong>通勤优先型</strong>租客，你会愿意在装修和小区品质上做出妥协，换取更短的通勤时间。
-          推荐你优先考虑：<strong>望京、十里堡、双井</strong> 这类既靠近核心商圈又有合理价位的区域，
-          避免回龙观这种通勤拉长 30 分钟以上的远郊。
-        </p>
+        <div className="space-y-2 text-sm text-foreground/80 leading-relaxed">
+          <p>
+            你是典型的<strong className="text-brand-red-deep">{result.personalityTag}</strong>租客。
+            你最在乎 <strong>{top1?.name}</strong>（{(top1?.weight * 100).toFixed(0)}%）和
+            <strong> {top2?.name}</strong>（{(top2?.weight * 100).toFixed(0)}%），
+            这两项加起来占了你决策权重的 {((top1.weight + top2.weight) * 100).toFixed(0)}%。
+          </p>
+          <p>
+            相反，你愿意在 <strong>{bottom1?.name}</strong>（仅 {(bottom1?.weight * 100).toFixed(0)}%）
+            上做出妥协——这意味着那些主打"优质{bottom1?.name}"但其他维度一般的房源，可以从你的候选里过滤掉。
+          </p>
+          <p>
+            接下来，我们会根据这个画像帮你筛选房源——把预算和注意力都集中在你真正在乎的事上。
+          </p>
+        </div>
       </Card>
+
+      {/* 重测按钮 */}
+      <div className="mt-6 flex justify-center">
+        <Button asChild variant="ghost" size="sm">
+          <Link href="/quiz">
+            <RotateCcw className="h-3.5 w-3.5" />
+            重新测试
+          </Link>
+        </Button>
+      </div>
     </div>
   );
 }
 
+// ============================================================
+// 场景 B 结果（暂时保持 mock，Phase 2 实现）
+// ============================================================
 function CompareResult() {
   const podium = [Crown, Trophy, Medal];
   return (

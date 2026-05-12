@@ -13,7 +13,7 @@ import Link from "next/link";
 import conjointConfig from "../../../data/conjoint-config.json";
 import type { ConjointConfig, QuizQuestion } from "@/types";
 
-const TOTAL_QUESTIONS = 8;
+const TOTAL_QUESTIONS = 10;
 
 export default function QuizPage() {
   const router = useRouter();
@@ -51,7 +51,7 @@ export default function QuizPage() {
     });
 
     if (currentIdx + 1 >= TOTAL_QUESTIONS) {
-      // 计算结果并跳转
+      // 主 conjoint 计算完成 → 跳转到硬筛选页（隶属 binary filters）
       const allAnswers = [
         ...answers,
         {
@@ -63,7 +63,7 @@ export default function QuizPage() {
       ];
       const result = buildPreferenceResult(allAnswers, config);
       setResult(result);
-      router.push("/result?from=quiz");
+      router.push("/quiz/filters");
     } else {
       setCurrentIdx((i) => i + 1);
       setRerenderTick((t) => t + 1);

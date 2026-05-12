@@ -117,7 +117,22 @@ export interface AttributeWeight {
 }
 
 export interface PreferenceResult {
+  /** 按 config.attributes 原顺序的权重（用于雷达图轴顺序稳定）*/
   weights: AttributeWeight[];
+  /** 按权重从大到小排序后的权重列表 */
+  sortedWeights: AttributeWeight[];
+  /** 主人格标签 */
   personalityTag: string;
+  /** 副标签（top-2 in 意 + 可妥协）*/
+  subTags: string[];
+  /** 自动生成的解读文案 */
+  description: string;
   topAttributeId: string;
+  topAttributeName: string;
+  bottomAttributeId: string;
+  bottomAttributeName: string;
+  /** levelId -> utility，调试用 */
+  utilities: Record<string, number>;
+  /** 用户的硬筛选偏好（yes/no），可选 */
+  binaryPreferences?: Record<string, boolean>;
 }
