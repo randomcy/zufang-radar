@@ -21,14 +21,9 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
-        {/* 高德地图预连接：提前打通 DNS + TLS，减少地图首帧加载时间 */}
-        <link rel="preconnect" href="https://webapi.amap.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://restapi.amap.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://webrd01.is.autonavi.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://webrd02.is.autonavi.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://webrd03.is.autonavi.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://webrd04.is.autonavi.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://vdata.amap.com" />
+        {/* 高德地图域名只做 dns-prefetch（非阻塞）；TLS 预连接放到 /map 路由里按需建立，避免拖慢首页加载 */}
+        <link rel="dns-prefetch" href="https://webapi.amap.com" />
+        <link rel="dns-prefetch" href="https://restapi.amap.com" />
       </head>
       <body className="min-h-screen bg-background font-sans antialiased">
         <Navbar />
