@@ -142,37 +142,17 @@ export function CommuteMap({
       });
     }
 
-    // ---- 1) 地铁站 marker（超过 120 站时只画范围内 + 远索拉近最近的站）----
-    const ANCHOR = companyA;
-    const distTo = (s: SubwayStation) => {
-      const dx = s.lng - ANCHOR.lng;
-      const dy = s.lat - ANCHOR.lat;
-      return dx * dx + dy * dy; // 无需准确，只用于排序
-    };
-    let stationsToDraw: SubwayStation[];
-    if (allStations.length > 120) {
-      const outOfRange = allStations
-        .filter((s) => !inRangeIds.has(s.id))
-        .sort((a, b) => distTo(a) - distTo(b))
-        .slice(0, 80);
-      const inRange = allStations.filter((s) => inRangeIds.has(s.id));
-      stationsToDraw = [...inRange, ...outOfRange];
-    } else {
-      stationsToDraw = allStations;
-    }
+    // ---- 1) 地铁站 marker：只画"通勤等时圈内"的站，避免地图被全城地铁站淹没 ----
+    const stationsToDraw: SubwayStation[] = allStations.filter((s) => inRangeIds.has(s.id));
     stationsToDraw.forEach((s) => {
-      const inRange = inRangeIds.has(s.id);
       const active = activeStationId === s.id;
       const lineColor = pickLineColor(s.line);
-
-      let html: string;
-      if (inRange) {
-        const meta = stationMetaMap[s.id];
-        const labelText = isDual && meta.minutesB !== undefined
-          ? `${meta.minutesA}/${meta.minutesB}min`
-          : `${meta.minutesA}min`;
-        const ringSize = active ? 16 : 13;
-        html = `
+      const meta = stationMetaMap[s.id];
+      const labelText = isDual && meta.minutesB !== undefined
+        ? `${meta.minutesA}/${meta.minutesB}min`
+        : `${meta.minutesA}min`;
+      const ringSize = active ? 16 : 13;
+      const html = `
           <div style="
             display:flex; align-items:center; gap:4px;
             transform: translate(-50%, -50%);
@@ -202,45 +182,32 @@ export function CommuteMap({
               ${labelText}
             </div>
           </div>`;
-      } else {
-        // 等时圈外的灰色小点（仅做底图参考）
-        html = `
-          <div style="
-            width:6px; height:6px;
-            background:#cbd5e1;
-            border:1.5px solid white;
-            border-radius:50%;
-            transform: translate(-50%, -50%);
-          "></div>`;
-      }
 
       const m = new AMap.Marker({
         position: [s.lng, s.lat],
         content: html,
         offset: new AMap.Pixel(0, 0),
         anchor: "center",
-        zIndex: inRange ? (active ? 200 : 120) : 80,
+        zIndex: active ? 200 : 120,
       });
 
-      if (inRange) {
-        m.on("click", () => onStationClick?.(s));
-        m.on("mouseover", () => {
-          const lines = expandLines(s.line).join(" · ");
-          const meta = stationMetaMap[s.id];
-          let label = `${s.name}（${lines}）`;
-          if (isDual && meta.minutesB !== undefined) {
-            label += ` · A:${meta.minutesA}min B:${meta.minutesB}min · 差${meta.diffMinutes}min`;
-          } else {
-            label += ` · 通勤${meta.minutesA}分钟`;
-          }
-          m.setLabel({
-            content: label,
-            direction: "top",
-            offset: new AMap.Pixel(0, -10),
-          });
+      m.on("click", () => onStationClick?.(s));
+      m.on("mouseover", () => {
+        const lines = expandLines(s.line).join(" · ");
+        const meta = stationMetaMap[s.id];
+        let label = `${s.name}（${lines}）`;
+        if (isDual && meta.minutesB !== undefined) {
+          label += ` · A:${meta.minutesA}min B:${meta.minutesB}min · 差${meta.diffMinutes}min`;
+        } else {
+          label += ` · 通勤${meta.minutesA}分钟`;
+        }
+        m.setLabel({
+          content: label,
+          direction: "top",
+          offset: new AMap.Pixel(0, -10),
         });
-        m.on("mouseout", () => m.setLabel(null));
-      }
+      });
+      m.on("mouseout", () => m.setLabel(null));
 
       newOverlays.push(m);
     });
