@@ -73,7 +73,7 @@ export const useConjointV2Store = create<State>()(
       reset: () => set({ result: null }),
     }),
     {
-      name: "zufang-radar-conjoint-v2",
+      name: "rentcheck-conjoint-v2",
     }
   )
 );

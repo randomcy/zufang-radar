@@ -81,7 +81,7 @@ node scripts/generate-data.js
 ### 项目结构
 
 ```
-zufang-radar/
+RentCheck/
 ├── data/                 # mock JSON（apartments / communities / posts / conjoint-config）
 ├── docs/                 # 设计文档
 ├── public/mock/          # mock 图片占位

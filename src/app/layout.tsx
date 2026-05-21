@@ -31,7 +31,7 @@ export default function RootLayout({
         <footer className="border-t border-border/60 bg-background py-8 mt-16">
           <div className="container text-center text-xs text-muted-foreground">
             <p>租房雷达 · 演示版本 · 数据均为虚构</p>
-            <p className="mt-1">© 2025 zufang-radar</p>
+            <p className="mt-1">© 2025 RentCheck</p>
           </div>
         </footer>
       </body>

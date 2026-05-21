@@ -48,7 +48,7 @@ export const usePreferenceStore = create<PreferenceState>()(
         }),
     }),
     {
-      name: "zufang-radar-preference",
+      name: "rentcheck-preference",
       partialize: (state) => ({
         // 跨页面持久化关键状态
         result: state.result,

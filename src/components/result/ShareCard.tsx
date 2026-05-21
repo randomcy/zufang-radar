@@ -109,7 +109,7 @@ export function ShareCard({ result }: Props) {
                     最在乎{t1?.name}、{t2?.name}
                   </div>
                   <div className="text-[10px] text-white/60 mt-1">
-                    扫码生成你自己的画像 · zufang-radar
+                    扫码生成你自己的画像 · RentCheck
                   </div>
                 </div>
               </div>

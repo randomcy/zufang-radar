@@ -192,7 +192,7 @@
 ## 五、目录结构
 
 ```
-zufang-radar/
+RentCheck/
 ├── README.md
 ├── docs/
 │   ├── product-design.md
