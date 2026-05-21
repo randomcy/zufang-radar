@@ -367,19 +367,17 @@ function NumericLevelPicker({
               确认
             </button>
           </div>
-          <div className="text-[9px] leading-tight">
-            {outOfBounds ? (
-              <span className="text-amber-600">
-                ⚠ 超出常见范围（{bounds.min}-{bounds.max} {bounds.unit}），仍可提交
-              </span>
-            ) : invalid ? (
-              <span className="text-rose-600">⚠ 请输入有效数字</span>
-            ) : (
-              <span className="text-muted-foreground">
-                以此为中心生成 ±25% 三档题目
-              </span>
-            )}
-          </div>
+          {(outOfBounds || invalid) && (
+            <div className="text-[9px] leading-tight">
+              {outOfBounds ? (
+                <span className="text-amber-600">
+                  ⚠ 超出常见范围（{bounds.min}-{bounds.max} {bounds.unit}），仍可提交
+                </span>
+              ) : (
+                <span className="text-rose-600">⚠ 请输入有效数字</span>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
