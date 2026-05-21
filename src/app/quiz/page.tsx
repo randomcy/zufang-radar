@@ -20,8 +20,13 @@ import {
   MIN_SELECTED,
   MAX_SELECTED,
   findAttr,
+  applyCustomValues,
+  CUSTOMIZABLE_NUMERIC_IDS,
+  CUSTOM_VALUE_BOUNDS,
   type Profile,
   type ConjointAttribute,
+  type CustomValueMap,
+  type CustomizableNumericId,
 } from "@/lib/conjoint-v2/attributes";
 import { generateTasks, type ChoiceTask } from "@/lib/conjoint-v2/task-generator";
 import {
@@ -51,6 +56,8 @@ interface Step1Props {
   toggleSelect: (id: string) => void;
   idealProfile: Profile;
   setIdealLevel: (attrId: string, levelIdx: number) => void;
+  customValues: CustomValueMap;
+  setCustomValue: (id: CustomizableNumericId, value: number | undefined) => void;
   hardConstraints: HardConstraints;
   setHardConstraints: (hc: HardConstraints) => void;
   onNext: () => void;
@@ -61,6 +68,8 @@ function StepSelection({
   toggleSelect,
   idealProfile,
   setIdealLevel,
+  customValues,
+  setCustomValue,
   hardConstraints,
   setHardConstraints,
   onNext,
@@ -163,24 +172,17 @@ function StepSelection({
                   <div className="text-[10px] text-muted-foreground mb-1.5">
                     你的理想是？
                   </div>
-                  <div className="flex flex-wrap gap-1">
-                    {attr.levels.map((lv, idx) => {
-                      const active = idealLv === idx;
-                      return (
-                        <button
-                          key={idx}
-                          onClick={() => setIdealLevel(attr.id, idx)}
-                          className={`text-[10px] px-2 py-1 rounded-md transition-colors ${
-                            active
-                              ? "bg-brand-red text-white font-medium"
-                              : "bg-secondary/60 text-muted-foreground hover:bg-secondary"
-                          }`}
-                        >
-                          {lv.label}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <NumericLevelPicker
+                    attr={attr}
+                    idealLv={idealLv}
+                    customValue={
+                      customValues[attr.id as CustomizableNumericId]
+                    }
+                    onSelectPreset={(idx) => setIdealLevel(attr.id, idx)}
+                    onCommitCustom={(v) =>
+                      setCustomValue(attr.id as CustomizableNumericId, v)
+                    }
+                  />
                 </div>
               )}
             </Card>
@@ -208,6 +210,178 @@ function StepSelection({
           每个维度的"理想 level"将用来锚定题目生成，让出题更贴近你的真实场景。
         </div>
       </div>
+    </div>
+  );
+}
+
+// ============================================================
+// NumericLevelPicker：最高 + 中 + 自定义
+// ============================================================
+
+interface NumericLevelPickerProps {
+  attr: ConjointAttribute;
+  idealLv: number;
+  customValue: number | undefined;
+  onSelectPreset: (lvIdx: number) => void;
+  onCommitCustom: (v: number | undefined) => void;
+}
+
+function NumericLevelPicker({
+  attr,
+  idealLv,
+  customValue,
+  onSelectPreset,
+  onCommitCustom,
+}: NumericLevelPickerProps) {
+  const isNumeric = CUSTOMIZABLE_NUMERIC_IDS.includes(
+    attr.id as CustomizableNumericId
+  );
+
+  // 非数字型维度：保留原本 3 档预设
+  if (!isNumeric) {
+    return (
+      <div className="flex flex-wrap gap-1">
+        {attr.levels.map((lv, idx) => {
+          const active = idealLv === idx;
+          return (
+            <button
+              key={idx}
+              onClick={() => onSelectPreset(idx)}
+              className={`text-[10px] px-2 py-1 rounded-md transition-colors ${
+                active
+                  ? "bg-brand-red text-white font-medium"
+                  : "bg-secondary/60 text-muted-foreground hover:bg-secondary"
+              }`}
+            >
+              {lv.label}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // 数字型：最高 + 中 + 自定义
+  const bounds = CUSTOM_VALUE_BOUNDS[attr.id as CustomizableNumericId];
+  // attr.levels 是「差→好」顺序。对于 preference=lower，“最高”是第一档（数值最大）；
+  // 对于 preference=higher，“最高”也是数值最大。都可以取 levels 中 value 最大的那一档。
+  const sortedByValue = [...attr.levels]
+    .map((lv, idx) => ({ lv, idx }))
+    .sort((a, b) => b.lv.value - a.lv.value); // 从大到小
+  const highest = sortedByValue[0]; // 数值最大
+  const middle = sortedByValue[1]; // 数值中间
+
+  const [editing, setEditing] = useState(customValue !== undefined);
+  const [draft, setDraft] = useState(
+    customValue !== undefined ? String(customValue) : ""
+  );
+  const customActive = customValue !== undefined;
+
+  const draftNum = Number(draft);
+  const outOfBounds =
+    draft !== "" &&
+    Number.isFinite(draftNum) &&
+    (draftNum < bounds.min || draftNum > bounds.max);
+  const invalid = draft !== "" && !Number.isFinite(draftNum);
+
+  const commitCustom = () => {
+    if (draft === "") {
+      onCommitCustom(undefined);
+      setEditing(false);
+      return;
+    }
+    if (invalid) return;
+    // 软提示：超范围也允许提交，但会显示警告
+    onCommitCustom(draftNum);
+  };
+
+  const selectPreset = (idx: number) => {
+    onCommitCustom(undefined); // 清除自定义
+    setDraft("");
+    setEditing(false);
+    onSelectPreset(idx);
+  };
+
+  return (
+    <div className="space-y-1.5">
+      <div className="flex flex-wrap gap-1 items-center">
+        {/* 最高档 */}
+        <button
+          onClick={() => selectPreset(highest.idx)}
+          className={`text-[10px] px-2 py-1 rounded-md transition-colors ${
+            idealLv === highest.idx && !customActive
+              ? "bg-brand-red text-white font-medium"
+              : "bg-secondary/60 text-muted-foreground hover:bg-secondary"
+          }`}
+        >
+          {highest.lv.label}
+        </button>
+        {/* 中档 */}
+        <button
+          onClick={() => selectPreset(middle.idx)}
+          className={`text-[10px] px-2 py-1 rounded-md transition-colors ${
+            idealLv === middle.idx && !customActive
+              ? "bg-brand-red text-white font-medium"
+              : "bg-secondary/60 text-muted-foreground hover:bg-secondary"
+          }`}
+        >
+          {middle.lv.label}
+        </button>
+        {/* 自定义按钮 */}
+        <button
+          onClick={() => setEditing((e) => !e)}
+          className={`text-[10px] px-2 py-1 rounded-md transition-colors ${
+            customActive
+              ? "bg-brand-red text-white font-medium"
+              : "bg-secondary/60 text-muted-foreground hover:bg-secondary"
+          }`}
+        >
+          {customActive ? `自定义 ${customValue}` : "自定义"}
+        </button>
+      </div>
+
+      {editing && (
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5">
+            <input
+              type="number"
+              inputMode="numeric"
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") commitCustom();
+              }}
+              placeholder={`例: ${Math.round(
+                (bounds.min + bounds.max) / 4
+              )}`}
+              className="flex-1 min-w-0 text-[11px] px-2 py-1 rounded-md border border-brand-red/30 focus:outline-none focus:border-brand-red bg-white"
+            />
+            <span className="text-[10px] text-muted-foreground shrink-0">
+              {bounds.unit}
+            </span>
+            <button
+              onClick={commitCustom}
+              disabled={invalid || draft === ""}
+              className="text-[10px] px-2 py-1 rounded-md bg-brand-red text-white font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              确认
+            </button>
+          </div>
+          <div className="text-[9px] leading-tight">
+            {outOfBounds ? (
+              <span className="text-amber-600">
+                ⚠ 超出常见范围（{bounds.min}-{bounds.max} {bounds.unit}），仍可提交
+              </span>
+            ) : invalid ? (
+              <span className="text-rose-600">⚠ 请输入有效数字</span>
+            ) : (
+              <span className="text-muted-foreground">
+                以此为中心生成 ±25% 三档题目
+              </span>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -346,14 +520,31 @@ export default function QuizPage() {
     return p;
   });
 
+  // 用户自定义的数字型中心值（会在 handleStartChoice 中被用来重生成 levels）
+  const [customValues, setCustomValues] = useState<CustomValueMap>({});
+  const setCustomValue = (
+    id: CustomizableNumericId,
+    value: number | undefined
+  ) => {
+    setCustomValues((cv) => {
+      const next = { ...cv };
+      if (value === undefined) delete next[id];
+      else next[id] = value;
+      return next;
+    });
+  };
+
+  // 应用了用户自定义的完整属性列表（走下游出题 / 编码 / WTP）
+  const effectiveSelectedAttrs = useMemo(
+    () => applyCustomValues(Array.from(selectedIds).map((id) => findAttr(id)!).filter(Boolean), customValues),
+    [selectedIds, customValues]
+  );
+
   const [tasks, setTasks] = useState<ChoiceTask[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [choices, setChoices] = useState<Record<number, number>>({});
 
-  const selectedAttrs = useMemo(
-    () => Array.from(selectedIds).map((id) => findAttr(id)!).filter(Boolean),
-    [selectedIds]
-  );
+  const selectedAttrs = effectiveSelectedAttrs;
 
   const toggleSelect = (id: string) => {
     const next = new Set(selectedIds);
@@ -503,6 +694,8 @@ export default function QuizPage() {
           toggleSelect={toggleSelect}
           idealProfile={idealProfile}
           setIdealLevel={setIdealLevel}
+          customValues={customValues}
+          setCustomValue={setCustomValue}
           hardConstraints={hardConstraints}
           setHardConstraints={setHardConstraints}
           onNext={handleStartChoice}

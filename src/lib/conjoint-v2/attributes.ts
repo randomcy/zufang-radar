@@ -224,3 +224,84 @@ export function findAttr(id: string): ConjointAttribute | undefined {
  * 例如 { price: 1, commute: 2, area: 0 } 表示租金中、通勤短、面积小
  */
 export type Profile = Record<string, number>;
+
+// ============================================================
+// 自定义数值（用户在 Step1 自定义某个数字型维度的中心值）
+// ============================================================
+
+/** 支持自定义输入的数字型属性 id（楼龄是文本类，不支持） */
+export const CUSTOMIZABLE_NUMERIC_IDS = [
+  "price",
+  "commute",
+  "area",
+  "subwayWalk",
+] as const;
+export type CustomizableNumericId = (typeof CUSTOMIZABLE_NUMERIC_IDS)[number];
+
+/** 每个数字维度的合理性边界（用于软提示） */
+export const CUSTOM_VALUE_BOUNDS: Record<
+  CustomizableNumericId,
+  { min: number; max: number; unit: string; label: string }
+> = {
+  price: { min: 500, max: 30000, unit: "元/月", label: "月租金" },
+  commute: { min: 5, max: 180, unit: "分钟", label: "通勤时间" },
+  area: { min: 10, max: 300, unit: "㎡", label: "房屋面积" },
+  subwayWalk: { min: 1, max: 60, unit: "分钟", label: "地铁步行" },
+};
+
+/** 自定义值存储：用户输入的中心值，缺省走 ATTRIBUTES_V2 的默认 levels */
+export type CustomValueMap = Partial<Record<CustomizableNumericId, number>>;
+
+/**
+ * 根据用户输入的中心值，生成 3 个 levels（差→好 顺序与 attribute.preference 一致）
+ * - 中间档 = 用户输入
+ * - 边缘档 = ±25%
+ * - preference=lower（如租金、通勤）：第一档高（差），第三档低（好）
+ * - preference=higher（如面积）：第一档低（差），第三档高（好）
+ */
+export function buildLevelsFromCenter(
+  attr: ConjointAttribute,
+  center: number
+): AttrLevel[] {
+  const lo = Math.round(center * 0.75);
+  const hi = Math.round(center * 1.25);
+  const mid = Math.round(center);
+  const unit = attr.unit ?? "";
+  const fmt = (n: number) => `${n} ${unit}`.trim();
+
+  // 差→好 顺序
+  if (attr.preference === "lower") {
+    return [
+      { label: fmt(hi), value: hi },
+      { label: fmt(mid), value: mid },
+      { label: fmt(lo), value: lo },
+    ];
+  }
+  // higher / nominal：低 → 高
+  return [
+    { label: fmt(lo), value: lo },
+    { label: fmt(mid), value: mid },
+    { label: fmt(hi), value: hi },
+  ];
+}
+
+/**
+ * 对一组属性应用 customValues，返回深拷贝后的新数组（levels 已被替换）
+ * 不修改全局 ATTRIBUTES_V2。
+ */
+export function applyCustomValues(
+  attrs: ConjointAttribute[],
+  custom: CustomValueMap
+): ConjointAttribute[] {
+  return attrs.map((attr) => {
+    const id = attr.id as CustomizableNumericId;
+    if (
+      CUSTOMIZABLE_NUMERIC_IDS.includes(id) &&
+      custom[id] !== undefined &&
+      Number.isFinite(custom[id])
+    ) {
+      return { ...attr, levels: buildLevelsFromCenter(attr, custom[id]!) };
+    }
+    return { ...attr, levels: attr.levels.map((lv) => ({ ...lv })) };
+  });
+}

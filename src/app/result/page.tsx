@@ -25,7 +25,6 @@ import {
   type ConjointV2Result,
 } from "@/store/conjointV2";
 import { findAttr } from "@/lib/conjoint-v2/attributes";
-import { AntiBrokerWidget } from "@/components/result/AntiBrokerWidget";
 import { ChecklistCard } from "@/components/result/ChecklistCard";
 
 // ============================================================
@@ -325,9 +324,6 @@ function ConjointReport({ result }: { result: ConjointV2Result }) {
           </p>
         </div>
       </Card>
-
-      {/* 反中介话术 widget */}
-      <AntiBrokerWidget />
 
       {/* 重测按钮 */}
       <div className="mt-6 flex justify-center">
