@@ -21,6 +21,7 @@ import fallbackStations from "../../../data/subway-stations.json";
 import communitiesData from "../../../data/communities.json";
 import type { Community } from "@/types";
 import { NearbyCommunities } from "@/components/map/NearbyCommunities";
+import ModeSwitcher from "@/components/map/ModeSwitcher";
 
 import {
   stationsWithinCommuteTime,
@@ -76,7 +77,11 @@ export default function MapPage() {
     "fallback"
   );
 
-  const [companyA, setCompanyA] = useState<Company>(DEFAULT_COMPANY_A);
+  // 为默认公司加 mode：A 地铁、B 驾车（你 Demo 的双人场景一眼看到差异）
+  const [companyA, setCompanyA] = useState<Company>({
+    ...DEFAULT_COMPANY_A,
+    mode: "subway",
+  });
   const [companyB, setCompanyB] = useState<Company | null>(null);
   const [maxMinutesA, setMaxMinutesA] = useState<number>(40);
   const [maxMinutesB, setMaxMinutesB] = useState<number>(40);
@@ -141,7 +146,17 @@ export default function MapPage() {
   }, [isDual, maxMinutesA, maxMinutesB, companyA.id, companyB?.id]);
 
   const handleEnableDual = () => {
-    setCompanyB(DEFAULT_COMPANY_B);
+    setCompanyB({ ...DEFAULT_COMPANY_B, mode: "drive" });
+  };
+
+  // 切换某个人的通勤方式
+  const setModeA = (mode: "subway" | "drive" | "bus") => {
+    if (mode === "bus") return; // 公交置灰，点击无响应
+    setCompanyA((c) => ({ ...c, mode }));
+  };
+  const setModeB = (mode: "subway" | "drive" | "bus") => {
+    if (mode === "bus") return;
+    setCompanyB((c) => (c ? { ...c, mode } : c));
   };
 
   const handleDisableDual = () => {
@@ -272,6 +287,13 @@ export default function MapPage() {
                 <span>90 分钟</span>
               </div>
             </div>
+
+            {/* A 通勤方式 */}
+            <ModeSwitcher
+              value={companyA.mode ?? "subway"}
+              onChange={setModeA}
+              theme="emerald"
+            />
           </Card>
 
           {/* 公司 B（双人模式才显示）*/}
@@ -339,6 +361,13 @@ export default function MapPage() {
                   <span>90 分钟</span>
                 </div>
               </div>
+
+              {/* B 通勤方式 */}
+              <ModeSwitcher
+                value={companyB.mode ?? "drive"}
+                onChange={setModeB}
+                theme="amber"
+              />
             </Card>
           )}
 
@@ -515,6 +544,8 @@ export default function MapPage() {
           <NearbyCommunities
             station={activeStation}
             communities={allCommunities}
+            companyA={companyA}
+            companyB={companyB}
           />
         </div>
       </div>

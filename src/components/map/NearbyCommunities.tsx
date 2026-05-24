@@ -10,8 +10,14 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, ArrowRight, Star, Train } from "lucide-react";
-import { haversine, type SubwayStation } from "@/lib/commute";
+import { MapPin, ArrowRight, Star, Train, Car } from "lucide-react";
+import {
+  haversine,
+  estimateCommuteMinutes,
+  estimateDriveMinutesOffline,
+  type SubwayStation,
+  type Company,
+} from "@/lib/commute";
 import type { Community } from "@/types";
 
 interface Props {
@@ -19,15 +25,39 @@ interface Props {
   communities: Community[];
   /** 步行可达半径（米），默认 1500m ≈ 步行 15-18 分钟 */
   walkRadius?: number;
+  /** 公司 A —— 用来同时展示地铁 / 驾车两种通勤数字 */
+  companyA?: Company;
+  /** 公司 B —— 可选，双人模式才传 */
+  companyB?: Company | null;
 }
 
 /** 步行速度：4.5 km/h = 75 m/min */
 const WALK_SPEED_M_PER_MIN = 75;
 
+/** 把小区当成「虚拟站点」算到公司的地铁通勤分钟数 */
+function commuteFromCommunity(
+  coords: { lng: number; lat: number },
+  company: Company
+): { subway: number; drive: number } {
+  const virtualStation: SubwayStation = {
+    id: "virtual",
+    name: "",
+    line: "",
+    lng: coords.lng,
+    lat: coords.lat,
+  };
+  return {
+    subway: estimateCommuteMinutes(virtualStation, company),
+    drive: estimateDriveMinutesOffline(coords, company),
+  };
+}
+
 export function NearbyCommunities({
   station,
   communities,
   walkRadius = 1500,
+  companyA,
+  companyB,
 }: Props) {
   const nearby = useMemo(() => {
     if (!station) return [];
@@ -37,15 +67,24 @@ export function NearbyCommunities({
           { lng: station.lng, lat: station.lat },
           c.coordinates
         );
+        // 双数字：地铁 vs 驾车，A/B 各一份（如果有 B）
+        const commuteA = companyA
+          ? commuteFromCommunity(c.coordinates, companyA)
+          : null;
+        const commuteB = companyB
+          ? commuteFromCommunity(c.coordinates, companyB)
+          : null;
         return {
           community: c,
           distM,
           walkMin: Math.round(distM / WALK_SPEED_M_PER_MIN),
+          commuteA,
+          commuteB,
         };
       })
       .filter((x) => x.distM <= walkRadius)
       .sort((a, b) => a.distM - b.distM);
-  }, [station, communities, walkRadius]);
+  }, [station, communities, walkRadius, companyA, companyB]);
 
   if (!station) {
     return (
@@ -91,7 +130,7 @@ export function NearbyCommunities({
         </div>
       ) : (
         <div className="space-y-2">
-          {nearby.slice(0, 5).map(({ community, distM, walkMin }) => {
+          {nearby.slice(0, 5).map(({ community, distM, walkMin, commuteA, commuteB }) => {
             const hr = community.hiddenRisks;
             const hasBad =
               hr && (hr.utility === "commercial" || hr.heating === "none");
@@ -119,6 +158,49 @@ export function NearbyCommunities({
                       </span>
                     </div>
                   </div>
+
+                  {/* 双数字通勤行：地铁 / 驾车 同时显示 */}
+                  {commuteA && (
+                    <div className="mb-1.5 flex items-center gap-3 text-[11px]">
+                      <span className="text-muted-foreground">
+                        {commuteB ? "A→" : "通勤"}
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <Train className="h-3 w-3 text-sky-600" />
+                        <span className="font-mono font-semibold tabular-nums text-sky-700">
+                          {commuteA.subway}
+                        </span>
+                        <span className="text-muted-foreground">min</span>
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <Car className="h-3 w-3 text-emerald-600" />
+                        <span className="font-mono font-semibold tabular-nums text-emerald-700">
+                          {commuteA.drive}
+                        </span>
+                        <span className="text-muted-foreground">min</span>
+                      </span>
+                    </div>
+                  )}
+                  {commuteB && (
+                    <div className="mb-1.5 flex items-center gap-3 text-[11px]">
+                      <span className="text-muted-foreground">B→</span>
+                      <span className="inline-flex items-center gap-1">
+                        <Train className="h-3 w-3 text-sky-600" />
+                        <span className="font-mono font-semibold tabular-nums text-sky-700">
+                          {commuteB.subway}
+                        </span>
+                        <span className="text-muted-foreground">min</span>
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <Car className="h-3 w-3 text-emerald-600" />
+                        <span className="font-mono font-semibold tabular-nums text-emerald-700">
+                          {commuteB.drive}
+                        </span>
+                        <span className="text-muted-foreground">min</span>
+                      </span>
+                    </div>
+                  )}
+
                   <div className="flex items-center justify-between flex-wrap gap-1.5">
                     <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
                       <span className="font-mono font-semibold text-foreground tabular-nums">

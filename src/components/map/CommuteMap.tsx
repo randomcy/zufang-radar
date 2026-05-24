@@ -142,8 +142,55 @@ export function CommuteMap({
       });
     }
 
-    // ---- 1) 地铁站 marker：只画"通勤等时圈内"的站，避免地图被全城地铁站淹没 ----
-    const stationsToDraw: SubwayStation[] = allStations.filter((s) => inRangeIds.has(s.id));
+    // ---- 0) 驾车等时圆 ----
+    // 如果某个人选了驾车，在其公司位置画一个虚线圆，
+    // 圆内区域 = 该人可驾车达到的范围。
+    // 匆忙公式推导：从 estimateDriveMinutesOffline 倒推半径
+    //   minutes = (km * 1.5 / 25 * 60 * 1.2) + 10
+    //   → km = (minutes - 10) / (60 * 1.2 / 25 * 1.5)
+    //         = (minutes - 10) * 25 / (60 * 1.5 * 1.2)
+    //         ≈ (minutes - 10) * 0.231 km
+    const driveRadiusKm = (minutes: number) =>
+      Math.max(2, (minutes - 10) * 25 / (60 * 1.5 * 1.2));
+
+    const drawDriveCircle = (
+      company: Company,
+      maxMinutes: number,
+      color: string,
+      fillColor: string
+    ) => {
+      const radiusM = driveRadiusKm(maxMinutes) * 1000;
+      const circle = new AMap.Circle({
+        center: [company.lng, company.lat],
+        radius: radiusM,
+        strokeColor: color,
+        strokeWeight: 2,
+        strokeOpacity: 0.85,
+        strokeStyle: "dashed",
+        strokeDasharray: [10, 6],
+        fillColor: fillColor,
+        fillOpacity: 0.12,
+        zIndex: 50,
+      });
+      newOverlays.push(circle);
+    };
+
+    const aIsDrive = companyA.mode === "drive";
+    const bIsDrive = isDual && companyB?.mode === "drive";
+
+    if (aIsDrive) {
+      drawDriveCircle(companyA, maxMinutesA ?? maxMinutes ?? 40, "#059669", "#10b981");
+    }
+    if (bIsDrive && companyB) {
+      drawDriveCircle(companyB, maxMinutesB ?? 40, "#d97706", "#f59e0b");
+    }
+
+    // ---- 1) 地铁站 marker：只画选了地铁模式的人的等时圈内的站 ----
+    // 双人场景下，如果两人都选驾车，地铁站不画；只要某人选了地铁就画其等时圈站
+    const showSubwayStations = !aIsDrive || (isDual && !bIsDrive);
+    const stationsToDraw: SubwayStation[] = showSubwayStations
+      ? allStations.filter((s) => inRangeIds.has(s.id))
+      : [];
     stationsToDraw.forEach((s) => {
       const active = activeStationId === s.id;
       const lineColor = pickLineColor(s.line);
