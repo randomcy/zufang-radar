@@ -26,6 +26,8 @@ import {
 } from "@/store/conjointV2";
 import { findAttr } from "@/lib/conjoint-v2/attributes";
 import { ChecklistCard } from "@/components/result/ChecklistCard";
+import { PersonaCard } from "@/components/result/PersonaCard";
+import { computePersona } from "@/lib/persona";
 
 // ============================================================
 // CompareResult 还是 mock（Phase 2 实现）
@@ -164,15 +166,52 @@ function ConjointReport({ result }: { result: ConjointV2Result }) {
   const bottomPct = bottom ? Math.round(bottom.importance * 100) : 0;
 
   const holdoutPct = Math.round(result.holdout.accuracy * 100);
-  const beatBaseline = result.holdout.accuracy > 1 / 3;
+  // 随机基准 = 1 / 每题 alt 数（二选一则 50%，三选一则 33%）
+  const nAltsPerTask = result.tasks[0]?.alternatives.length ?? 2;
+  const baseline = 1 / nAltsPerTask;
+  const baselinePct = Math.round(baseline * 100);
+  const beatBaseline = result.holdout.accuracy > baseline;
+
+  // 租房人格（Rent-MBTI）：从 importance + part-worth 里推出 4 轴 16 人格之一
+  const persona = useMemo(
+    () => computePersona(result.importance, result.partWorths),
+    [result.importance, result.partWorths]
+  );
+
+  const nFormal = Math.max(0, result.tasks.length - 2);
 
   return (
     <div>
+      {/* 顶部：租房人格卡（亲切包装） */}
+      <div className="mb-8">
+        <PersonaCard persona={persona} />
+      </div>
+
+      {/* 人格过渡提示 + 硬核报告折叠 */}
+      <details className="mb-8 group">
+        <summary className="cursor-pointer list-none flex items-center justify-between gap-2 px-4 py-3 rounded-lg border border-border bg-secondary/30 hover:bg-secondary/50 transition-colors">
+          <div>
+            <p className="text-sm font-semibold text-foreground">
+              看看这个人格是怎么算出来的
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              完整的 β 权重 / 效用分布 / WTP 付费意愿 / 信度报告
+            </p>
+          </div>
+          <span className="text-xs text-muted-foreground shrink-0 group-open:hidden">
+            点击展开 ▼
+          </span>
+          <span className="text-xs text-muted-foreground shrink-0 hidden group-open:inline">
+            点击收起 ▲
+          </span>
+        </summary>
+
+        <div className="mt-6">
       {/* Hero */}
       <div className="mb-10">
         <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-brand-red-deep mb-2">
           <Sparkles className="h-3.5 w-3.5" />
-          你的偏好画像 · Conjoint Analysis
+          硬核报告 · Conjoint Analysis
         </div>
         <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-3 leading-tight">
           选房时你最看重
@@ -195,7 +234,7 @@ function ConjointReport({ result }: { result: ConjointV2Result }) {
           )}
         </h1>
         <p className="text-muted-foreground max-w-2xl mt-3 leading-relaxed">
-          基于你 {result.tasks.length - 2} 道正式题的选择，用 MNL（Multinomial Logit）模型
+          基于你 {nFormal} 道正式题的选择，用 MNL（Multinomial Logit）模型
           + L2 正则估计了你在 {result.selectedAttrIds.length} 个维度上的偏好。
           {bottomAttr &&
             ` 你愿意为前两项在「${bottomAttr.icon} ${bottomAttr.name}」上做出妥协。`}
@@ -205,7 +244,7 @@ function ConjointReport({ result }: { result: ConjointV2Result }) {
         <div className="mt-5 flex flex-wrap gap-2">
           <Badge variant={beatBaseline ? "default" : "outline"}>
             <Target className="h-3 w-3 mr-1" />
-            Holdout 准确率 {holdoutPct}%（随机基准 33%）
+            Holdout 准确率 {holdoutPct}%（随机基准 {baselinePct}%）
           </Badge>
           <Badge variant="outline">
             {result.converged ? (
@@ -272,13 +311,16 @@ function ConjointReport({ result }: { result: ConjointV2Result }) {
         </Card>
       )}
 
-      {/* 4. 看房避坑清单（actionable 下游） */}
+        </div>
+      </details>
+
+      {/* 4. 看房避坑清单（actionable 下游 — 默认展开） */}
       <ChecklistCard
         importance={result.importance}
         hardConstraints={result.hardConstraints ?? DEFAULT_HARD_CONSTRAINTS}
       />
 
-      {/* 5. 自然语言解读 */}
+      {/* 5. 自然语言解读 — 默认展开，紧跟 ChecklistCard 下面，用朋友语气总结 */}
       <Card className="p-6 mb-6 bg-brand-red-pale/40 border-brand-red/10">
         <h3 className="font-bold mb-3 flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-brand-red-deep" />
@@ -315,12 +357,14 @@ function ConjointReport({ result }: { result: ConjointV2Result }) {
           <p>
             模型在 2 道 holdout 题上达到 <strong>{holdoutPct}%</strong> 的预测准确率，
             {beatBaseline
-              ? "高于 33% 随机基准，说明你的偏好结构是稳定的。"
+              ? `高于 ${baselinePct}% 随机基准，说明你的偏好结构是稳定的。`
               : "略低于随机基准，说明你的偏好可能存在权衡和不一致，建议重测获得更稳定结果。"}
           </p>
           <p className="text-muted-foreground">
-            方法学：12 道 CBC 选择题 → MNL 模型（softmax + L2 正则 λ=1.0）→
+            方法学：{nFormal + 2} 道选择题（含 2 道 holdout）→ MNL 模型（softmax + L2 正则 λ=1.0）→
             Adam 优化器（lr=0.05, maxIter=300）反解 β → 计算 part-worth、importance、WTP。
+            <br />
+            人格代号推导：4 个二分轴均为 importance / part-worth 的加权函数，你的人格是这 4 个轴输出字母的拼接。
           </p>
         </div>
       </Card>
