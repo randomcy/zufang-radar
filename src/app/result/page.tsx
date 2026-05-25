@@ -189,6 +189,59 @@ function ConjointReport({ result }: { result: ConjointV2Result }) {
         <PersonaCard persona={persona} />
       </div>
 
+      {/* 默认展开：对你来说最重要的事 + 维度强度 */}
+      <Card className="p-6 mb-6">
+        <div className="mb-5">
+          <h2 className="text-lg font-bold flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-brand-red-deep" />
+            对你来说，最重要的事是什么
+          </h2>
+          <p className="text-xs text-muted-foreground mt-1">
+            从你的选择里反推的偏好权重，按重要性排序
+          </p>
+        </div>
+
+        {/* Top-3 重点卡 */}
+        {sortedImportance.length > 0 && (
+          <div className="grid grid-cols-3 gap-3 mb-6">
+            {sortedImportance.slice(0, 3).map((imp, idx) => {
+              const attr = findAttr(imp.attrId);
+              const pct = Math.round(imp.importance * 100);
+              const medals = ["🥇", "🥈", "🥉"];
+              const tones = [
+                "from-brand-red/15 to-brand-red/5 border-brand-red/30",
+                "from-rose-400/15 to-rose-400/5 border-rose-400/30",
+                "from-amber-400/15 to-amber-400/5 border-amber-400/30",
+              ];
+              return (
+                <div
+                  key={imp.attrId}
+                  className={`rounded-xl p-3 bg-gradient-to-br border ${tones[idx]}`}
+                >
+                  <div className="text-xs text-muted-foreground mb-1">
+                    {medals[idx]} 第 {idx + 1} 位
+                  </div>
+                  <div className="font-bold text-sm leading-tight">
+                    {attr?.icon} {attr?.name ?? imp.attrName}
+                  </div>
+                  <div className="mt-2 text-2xl font-bold tabular-nums text-brand-red-deep">
+                    {pct}%
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* 全部维度的强度条 */}
+        <div>
+          <h3 className="text-sm font-semibold mb-3 text-foreground/80">
+            每个维度的强度
+          </h3>
+          <ImportanceBars importance={sortedImportance} />
+        </div>
+      </Card>
+
       {/* 人格过渡提示 + 硬核报告折叠 */}
       <details className="mb-8 group">
         <summary className="cursor-pointer list-none flex items-center justify-between gap-2 px-4 py-3 rounded-lg border border-border bg-secondary/30 hover:bg-secondary/50 transition-colors">
