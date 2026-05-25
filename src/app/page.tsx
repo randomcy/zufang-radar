@@ -24,18 +24,18 @@ export default function HomePage() {
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-balance leading-[1.05]">
-              租房,不是
+              选房,其实是
               <br />
               <span className="bg-gradient-to-r from-brand-red to-rose-500 bg-clip-text text-transparent">
-                信息搜集大赛。
+                和自己的对话。
               </span>
             </h1>
 
             <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto text-balance leading-relaxed">
-              90% 的痛点不是"找不到房源",而是
-              <span className="text-foreground font-medium">不知道自己要什么</span>、
-              <span className="text-foreground font-medium">不知道通勤多久能忍</span>、
-              <span className="text-foreground font-medium">看不到真实居住体验</span>。
+              在打开租房软件之前,先弄清楚——
+              <span className="text-foreground font-medium">你是谁</span>、
+              <span className="text-foreground font-medium">你要什么</span>、
+              <span className="text-foreground font-medium">你能忍什么</span>。
             </p>
           </div>
 
