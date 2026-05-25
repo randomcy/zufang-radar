@@ -32,7 +32,7 @@ export default function HomePage() {
             </h1>
 
             <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto text-balance leading-relaxed">
-              在打开租房软件之前,先弄清楚——
+              在打开租房软件之前,先认清——
               <span className="text-foreground font-medium">你是谁</span>、
               <span className="text-foreground font-medium">你要什么</span>、
               <span className="text-foreground font-medium">你能忍什么</span>。
@@ -50,7 +50,7 @@ export default function HomePage() {
               <div className="relative">
                 <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-white/80 mb-3">
                   <Brain className="h-3.5 w-3.5" />
-                  功能一 · 弄清自己
+                  功能一 · 认清自己
                 </div>
                 <div className="text-xl font-bold mb-1.5">2 分钟租房偏好测试</div>
                 <div className="text-sm text-white/85 leading-relaxed mb-4">

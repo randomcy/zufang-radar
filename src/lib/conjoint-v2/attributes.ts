@@ -36,6 +36,16 @@ export interface ConjointAttribute {
   defaultSelected?: boolean;
   /** 单位（卡片显示用，如 元/月、分钟、㎡） */
   unit?: string;
+  /**
+   * 在 BYO 勾选 UI 里隐藏：用户看不到、不能勾选/取消。
+   * 适用于已在硬约束里设置过的维度（如 price 已被 maxRent 覆盖）。
+   */
+  hiddenInBYO?: boolean;
+  /**
+   * 总是进入 Conjoint 出题，不需用户勾选。
+   * 与 hiddenInBYO 配合：用户看不到选项，但 β 报告完整。
+   */
+  alwaysActive?: boolean;
 }
 
 /**
@@ -44,14 +54,20 @@ export interface ConjointAttribute {
  */
 export const ATTRIBUTES_V2: ConjointAttribute[] = [
   {
+    // 注意：price 在 BYO 勾选 UI 里隐藏（hiddenInBYO: true），
+    // 因为硬约束模块已经让用户填了「月租金上限」，再选一次冗余。
+    // 但 price 仍然 alwaysActive: true 进入 Conjoint 出题，β 报告完整。
+    // 出题时的 level 中心值由 HardConstraints.maxRent 动态喂给 task-generator。
     id: "price",
     name: "月租金",
     icon: "💰",
-    hint: "每月房租预算，越低越好",
+    hint: "已在上方设置预算上限",
     encoding: "linear",
     preference: "lower",
     unit: "元/月",
     defaultSelected: true,
+    hiddenInBYO: true,
+    alwaysActive: true,
     levels: [
       { label: "6000 元", value: 6000 },
       { label: "4500 元", value: 4500 },
@@ -62,7 +78,7 @@ export const ATTRIBUTES_V2: ConjointAttribute[] = [
     id: "commute",
     name: "通勤时间",
     icon: "🚇",
-    hint: "单程通勤时长，越短越好",
+    hint: "你能接受的单程通勤上限",
     encoding: "linear",
     preference: "lower",
     unit: "分钟",
@@ -89,13 +105,11 @@ export const ATTRIBUTES_V2: ConjointAttribute[] = [
     ],
   },
   {
-    // 维度重构：旧设计「电梯有/无」是伪需求——没人独立地偏好电梯，
-    // 真正的偏好是「爬楼成本」，即电梯×楼层的复合体验。
-    // 重构后三个 level 都是真实存在的生活场景，反映「你肯不肯意爬楼」这个真实取舍。
-    id: "elevator", // 保留 id 避免改 persona 轴映射 / 历史数据兼容，语义已变「爬楼场景」
+    // 维度重构：电梯×楼层做成复合维度，三个 level 是三种爬楼成本场景。
+    id: "elevator", // 保留 id 避免改 persona 轴映射 / 历史数据兼容，语义为「爬楼场景」
     name: "楼层×电梯",
     icon: "🏢",
-    hint: "真正的偏好是「爬楼成本」，不是「有没有电梯」",
+    hint: "楼层和电梯的组合场景",
     encoding: "partWorth",
     preference: "higher",
     levels: [

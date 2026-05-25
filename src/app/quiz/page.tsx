@@ -74,7 +74,12 @@ function StepSelection({
   setHardConstraints,
   onNext,
 }: Step1Props) {
-  const canProceed = selectedIds.size >= MIN_SELECTED;
+  // 可见维度计数（排除 hiddenInBYO，如 price 已由硬约束管）
+  const visibleSelectedCount = Array.from(selectedIds).filter((id) => {
+    const a = ATTRIBUTES_V2.find((x) => x.id === id);
+    return a && !a.hiddenInBYO;
+  }).length;
+  const canProceed = visibleSelectedCount >= MIN_SELECTED;
 
   return (
     <div>
@@ -95,42 +100,42 @@ function StepSelection({
         onChange={setHardConstraints}
       />
 
-      {/* 勾选进度 */}
+      {/* 勾选进度（只计可见维度）*/}
       <div className="mb-5 flex items-center justify-between text-sm">
         <span className="text-muted-foreground">
           已勾选{" "}
           <span
             className={`font-bold tabular-nums ${
-              selectedIds.size >= MIN_SELECTED && selectedIds.size <= MAX_SELECTED
+              visibleSelectedCount >= MIN_SELECTED && visibleSelectedCount <= MAX_SELECTED
                 ? "text-emerald-600"
-                : selectedIds.size > MAX_SELECTED
+                : visibleSelectedCount > MAX_SELECTED
                 ? "text-amber-600"
                 : "text-muted-foreground"
             }`}
           >
-            {selectedIds.size}
+            {visibleSelectedCount}
           </span>{" "}
           / {MAX_SELECTED}
         </span>
-        {selectedIds.size > MAX_SELECTED && (
+        {visibleSelectedCount > MAX_SELECTED && (
           <span className="inline-flex items-center gap-1 text-xs text-amber-700">
             <AlertCircle className="h-3 w-3" />
             最多 {MAX_SELECTED} 个，请取消一些
           </span>
         )}
-        {selectedIds.size < MIN_SELECTED && (
+        {visibleSelectedCount < MIN_SELECTED && (
           <span className="text-xs text-muted-foreground">
-            至少再选 {MIN_SELECTED - selectedIds.size} 个
+            至少再选 {MIN_SELECTED - visibleSelectedCount} 个
           </span>
         )}
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
-        {ATTRIBUTES_V2.map((attr) => {
+        {ATTRIBUTES_V2.filter((attr) => !attr.hiddenInBYO).map((attr) => {
           const selected = selectedIds.has(attr.id);
           const idealLv = idealProfile[attr.id] ?? attr.levels.length - 1;
           const disabled =
-            !selected && selectedIds.size >= MAX_SELECTED;
+            !selected && visibleSelectedCount >= MAX_SELECTED;
 
           return (
             <Card
@@ -170,7 +175,9 @@ function StepSelection({
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="text-[10px] text-muted-foreground mb-1.5">
-                    你的理想是？
+                    {attr.preference === "lower"
+                      ? "你能接受的上限是？"
+                      : "你的理想是？"}
                   </div>
                   <NumericLevelPicker
                     attr={attr}
@@ -612,9 +619,18 @@ export default function QuizPage() {
   const selectedAttrs = effectiveSelectedAttrs;
 
   const toggleSelect = (id: string) => {
+    // 保护：hiddenInBYO 的维度用户不能 toggle
+    const attr = ATTRIBUTES_V2.find((a) => a.id === id);
+    if (attr?.hiddenInBYO) return;
     const next = new Set(selectedIds);
     if (next.has(id)) next.delete(id);
-    else if (next.size < MAX_SELECTED) next.add(id);
+    else {
+      const visibleCount = Array.from(next).filter((x) => {
+        const a = ATTRIBUTES_V2.find((y) => y.id === x);
+        return a && !a.hiddenInBYO;
+      }).length;
+      if (visibleCount < MAX_SELECTED) next.add(id);
+    }
     setSelectedIds(next);
   };
 
