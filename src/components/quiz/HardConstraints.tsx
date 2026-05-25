@@ -35,12 +35,8 @@ const TOGGLES: {
     label: "必须集中供暖",
     hint: "拒绝自采暖/无供暖（北方过冬关键）",
   },
-  {
-    key: "requirePrivateBath",
-    icon: "🛁",
-    label: "必须独立卫生间",
-    hint: "拒绝合用卫浴（合租党核心痛点）",
-  },
+  // 移除「必须独立卫生间」：BYO 里已有「独立卫浴」维度，重复。
+  // store 字段 requirePrivateBath 保留以兼容，但 UI 不再展示。
   {
     key: "rejectPartition",
     icon: "🚫",
