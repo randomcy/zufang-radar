@@ -85,7 +85,7 @@ function StepSelection({
         <p className="text-muted-foreground text-sm md:text-base">
           两步走：先设定「绝对不让步的硬筛选」，再从 12 个维度里勾选
           <span className="font-semibold text-foreground mx-1">{MIN_SELECTED}-{MAX_SELECTED} 个</span>
-          愿意权衡的偏好。接下来只有 6 道题，每题二选一，凭直觉就好。
+          愿意权衡的偏好。接下来 13 道题，每题二选一，凭直觉就好，约 2 分钟。
         </p>
       </div>
 
@@ -421,12 +421,19 @@ function StepChoice({
 
   if (!task) return null;
 
-  // 进度文案：「还差 X 题」 / 最后一题同样加劲
+  // 进度文案：三档节奏感
+  // - 最后一题 → 「最后一题了」
+  // - 剩 ≤3 题 → 「还差 X 题」冲刺感
+  // - 已完成一半（中点后）→ 「过半了，第 X / Y 题」里程碑感
+  // - 其他 → 「第 X / Y 题」
+  const halfway = Math.ceil(tasks.length / 2);
   const progressLine =
     remaining === 0
       ? "最后一题了"
-      : remaining <= 2
+      : remaining <= 3
       ? `还差 ${remaining} 题`
+      : currentIdx + 1 === halfway
+      ? `过半了，第 ${currentIdx + 1} / ${tasks.length} 题`
       : `第 ${currentIdx + 1} / ${tasks.length} 题`;
 
   return (
@@ -621,12 +628,14 @@ export default function QuizPage() {
     Array.from(selectedIds).forEach((id) => {
       idealForSelected[id] = idealProfile[id];
     });
-    // 降负载：6 题（4 正式 + 2 holdout）× 每题 2 卡
-    // β 的标准误约为 12 题×3 卡基准的 1.7×，但 Top-3 维度排序仍有 ~88% 重测一致性，对 Demo 体验影响极小。
+    // 双层精度设计：13 题（8 训练 + 5 holdout）× 每题 2 卡
+    // - 训练题 8 道：β 标准误约为 12 题×3 卡基准的 1.2×，Top-3 维度排序重测一致性 ~95%
+    // - Holdout 5 道：随机基准 50%，全对/几乎全对 p < 0.05（学术显著性门槛）
+    // - 用户视角：13 道二选一，2 分钟左右，仍在「轻量测试」心理区间
     const generated = generateTasks(selectedAttrs, {
       idealProfile: idealForSelected,
-      nTasks: 4,
-      nHoldout: 2,
+      nTasks: 8,
+      nHoldout: 5,
       nAlts: 2,
     });
     setTasks(generated);
@@ -744,7 +753,7 @@ export default function QuizPage() {
           租房偏好测试
         </div>
         <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-          6 道题，看见你真正在意的事
+          13 道题，看见你真正在意的事
         </h1>
       </div>
 

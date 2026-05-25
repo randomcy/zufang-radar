@@ -178,7 +178,9 @@ function ConjointReport({ result }: { result: ConjointV2Result }) {
     [result.importance, result.partWorths]
   );
 
-  const nFormal = Math.max(0, result.tasks.length - 2);
+  // 动态取 holdout 题数（当前设计是 5，不再硬编码）
+  const nHoldout = result.holdout.n;
+  const nFormal = Math.max(0, result.tasks.length - nHoldout);
 
   return (
     <div>
@@ -355,13 +357,13 @@ function ConjointReport({ result }: { result: ConjointV2Result }) {
             </p>
           )}
           <p>
-            模型在 2 道 holdout 题上达到 <strong>{holdoutPct}%</strong> 的预测准确率，
+            模型在 {nHoldout} 道 holdout 题上猜对了 <strong>{result.holdout.nCorrect}/{nHoldout}</strong>（准确率 <strong>{holdoutPct}%</strong>），
             {beatBaseline
-              ? `高于 ${baselinePct}% 随机基准，说明你的偏好结构是稳定的。`
+              ? `高于 ${baselinePct}% 随机基准。以 ${nHoldout} 题二选一、随机猜中 ${nHoldout} 题的概率不足 ${Math.round(100 * Math.pow(0.5, nHoldout))}%，这说明你的偏好结构稳定且可被建模。`
               : "略低于随机基准，说明你的偏好可能存在权衡和不一致，建议重测获得更稳定结果。"}
           </p>
           <p className="text-muted-foreground">
-            方法学：{nFormal + 2} 道选择题（含 2 道 holdout）→ MNL 模型（softmax + L2 正则 λ=1.0）→
+            方法学：{nFormal + nHoldout} 道选择题（{nFormal} 道训练 + {nHoldout} 道 holdout）→ MNL 模型（softmax + L2 正则 λ=1.0）→
             Adam 优化器（lr=0.05, maxIter=300）反解 β → 计算 part-worth、importance、WTP。
             <br />
             人格代号推导：4 个二分轴均为 importance / part-worth 的加权函数，你的人格是这 4 个轴输出字母的拼接。
