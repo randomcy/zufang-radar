@@ -145,7 +145,7 @@ function computeSC(
 
 /**
  * 务实 vs 讲究轴：
- *   - 左极 R (Realist)：电梯 + 独立卫浴 权重高（基础设施控）
+ *   - 左极 R (Realist)：楼层×电梯·爬楼成本 + 独立卫浴 权重高（基础生活体验控）
  *   - 右极 A (Aesthete)：装修 + 采光 权重高（颜值控）
  */
 function computeRA(importance: Importance[]): AxisScore {
@@ -191,7 +191,7 @@ export const PERSONA_DICT: Record<string, PersonaMeta> = {
     tagline: "钱要花在刀刃上，通勤越短越好，能跟人合住没问题",
     description:
       "你是典型的初入职场北漂——预算紧、时间贵、对装修阳台没什么执念。你会为了离公司近 10 分钟接受合租，也会为了便宜 500 块接受老房子。",
-    loves: ["地铁 5 分钟内", "6000 元以下整租或两人合租", "电梯老破小也行"],
+    loves: ["地铁 5 分钟内", "6000 元以下整租或两人合租", "无梯老破小也能接受"],
     cohort: "应届第 1-2 年、互联网/咨询初级岗、刚毕业实习生",
     opposite: "QLAA",
     rarity: 0.18,
@@ -297,7 +297,7 @@ export const PERSONA_DICT: Record<string, PersonaMeta> = {
     tagline: "时间最贵，房子要够大够好——为效率付费",
     description:
       "你的预算不算特别紧，但你绝对不接受通勤超过 30 分钟。你愿意为整租 + 大面积 + 好基础设施付溢价，但不会为装修花钱。",
-    loves: ["整租 1.5 居以上", "地铁 10 分钟内", "电梯 + 独卫"],
+    loves: ["整租 1.5 居以上", "地铁 10 分钟内", "有梯 + 独卫"],
     cohort: "工作 3-5 年的中级岗、互联网/咨询/投行 P5-P6",
     opposite: "PCLA",
     rarity: 0.07,
@@ -349,7 +349,7 @@ export const PERSONA_DICT: Record<string, PersonaMeta> = {
     tagline: "合租可以，但要住大房子——人均 5000 也接受",
     description:
       "你不是被迫合租，你是主动选择合租——同样的钱独居只能住开间，合租可以住三居豪华公寓。你的合租伙伴往往是同事或好友。",
-    loves: ["三居豪华整租", "近地铁", "电梯洋房"],
+    loves: ["三居豪华整租", "近地铁", "有梯洋房高层"],
     cohort: "金融/咨询年轻 VP、海归回国稳定后",
     opposite: "PELA",
     rarity: 0.03,

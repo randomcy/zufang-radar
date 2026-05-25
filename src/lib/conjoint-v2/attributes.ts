@@ -89,17 +89,19 @@ export const ATTRIBUTES_V2: ConjointAttribute[] = [
     ],
   },
   {
-    id: "elevator",
-    name: "电梯",
-    icon: "🛗",
-    hint: "楼栋是否有电梯",
+    // 维度重构：旧设计「电梯有/无」是伪需求——没人独立地偏好电梯，
+    // 真正的偏好是「爬楼成本」，即电梯×楼层的复合体验。
+    // 重构后三个 level 都是真实存在的生活场景，反映「你肯不肯意爬楼」这个真实取舍。
+    id: "elevator", // 保留 id 避免改 persona 轴映射 / 历史数据兼容，语义已变「爬楼场景」
+    name: "楼层×电梯",
+    icon: "🏢",
+    hint: "真正的偏好是「爬楼成本」，不是「有没有电梯」",
     encoding: "partWorth",
     preference: "higher",
     levels: [
-      { label: "无电梯", value: 0 },
-      { label: "有电梯", value: 1 },
-      // 二分变量人为补一个"新电梯"使其也是 3 levels（统一处理）
-      { label: "新装电梯", value: 2, desc: "近 3 年" },
+      { label: "无梯·1-2 楼", value: 0, desc: "不用爬，但也要接受采光/隐私问题" },
+      { label: "无梯·3-6 楼", value: 1, desc: "每天爬楼，外卖快递带上来会加价" },
+      { label: "有梯·任意楼层", value: 2, desc: "上下随意，搬家不费劲" },
     ],
   },
   {

@@ -192,13 +192,13 @@ const DIMENSION_CHECKLIST: Record<string, ChecklistItem[]> = {
   ],
   elevator: [
     {
-      id: "e-peak-wait",
+      id: "e-climb-cost",
       trigger: { attrId: "elevator", minImportance: 0.05 },
       category: "现场",
-      icon: "🛗",
-      title: "高峰期实测电梯等待时间",
+      icon: "🏢",
+      title: "爬楼成本实测：按最坏场景看房",
       detail:
-        "20 层 + 1 部电梯 = 早 8 点要等 5-10 分钟。早高峰实测一次。电梯老旧（90 年代以前）的还要看保养记录。",
+        "无梯·中高层：看房时提着满杯水走上去，提前领教现实。有梯·高层：早 8 点实测等梯时间，20 层 + 1 部梯 = 5-10 分钟。电梯老旧（90 年代以前）要问物业要保养记录。复合评估你能不能受。",
       priority: 55,
     },
   ],
